@@ -1,6 +1,6 @@
 # HL7 FHIR Validation Service
 
-The HL7® FHIR® Validation Service provides a persistent service for executing the 
+The `fhir-validator-wrapper` provides a persistent service for executing the 
 [FHIR® Validator](https://wiki.hl7.org/Using_the_FHIR_Validator). It is intended to provide validation capabilities
 to other applications that integrate it.
 
