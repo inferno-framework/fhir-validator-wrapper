@@ -2,7 +2,8 @@ language: java
 
 jobs:
   include:
-    - script:
+    - name: "Build and Test"
+      script:
         - ./gradlew build
 
       before_cache:
@@ -14,7 +15,8 @@ jobs:
           - $HOME/.gradle/caches/
           - $HOME/.gradle/wrapper/
 
-    - services:
+    - name: "Docker Build"
+      services:
         - docker
       script:
         - docker build -t hl7_validator .
