@@ -19,7 +19,7 @@ dependencies {
     // https://chat.fhir.org/#narrow/stream/179166-implementers/topic/New.20validator.20JAR.20location
     // the ig-publisher uses this one too
     // https://github.com/HL7/fhir-ig-publisher/blob/master/pom.xml#L68
-    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "4.1.22-SNAPSHOT")
+    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "4.1.41-SNAPSHOT")
 
     // validator dependencies (should be able to get these automatically?)
     implementation("org.apache.commons","commons-compress", "1.19")
