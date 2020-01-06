@@ -1,6 +1,9 @@
 package org.mitre.inferno;
 
 import org.mitre.inferno.rest.ValidatorEndpoint;
+import org.mitre.inferno.utils.SparkUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class App {
 
@@ -10,12 +13,13 @@ public class App {
    * @param args the application initialization arguments
    */
   public static void main(String[] args) {
+    Logger logger = LoggerFactory.getLogger(App.class);
     if (args.length > 0) {
       if (args[0].equals("prepare")) {
-        System.out.println("Initializing Validator App...");
+        logger.info("Initializing Validator App...");
         initializeValidator();
       } else {
-        System.out.println("Argument " + args[0] + " is unknown");
+        logger.warn("Argument " + args[0] + " is unknown");
         startApp();
       }
     } else {
@@ -35,7 +39,9 @@ public class App {
    * Starts the app.
    */
   private static void startApp() {
-    System.out.println("Starting Server...");
+    Logger logger = LoggerFactory.getLogger(App.class);
+    logger.info("Starting Server...");
+    SparkUtils.createServerWithRequestLog(logger);
     ValidatorEndpoint.getInstance();
   }
 }

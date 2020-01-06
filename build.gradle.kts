@@ -29,6 +29,8 @@ dependencies {
     // GSON for our JSON needs
     implementation("com.google.code.gson", "gson", "2.8.6")
 
+    implementation("org.slf4j", "slf4j-log4j12", "1.7.30")
+
     // Web Server
     implementation("com.sparkjava", "spark-core", "2.9.1")
 
