@@ -71,6 +71,7 @@ public class Validator {
     hl7Validator.loadIg(igFile, true);
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setNative(false);
+    hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.prepare();
   }
 
