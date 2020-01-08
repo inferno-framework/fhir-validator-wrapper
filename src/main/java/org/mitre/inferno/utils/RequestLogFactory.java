@@ -1,10 +1,10 @@
 package org.mitre.inferno.utils;
 
-import org.eclipse.jetty.server.Slf4jRequestLogWriter;
-import org.eclipse.jetty.server.CustomRequestLog;
-import org.slf4j.Logger;
-
 import java.io.IOException;
+
+import org.eclipse.jetty.server.CustomRequestLog;
+import org.eclipse.jetty.server.Slf4jRequestLogWriter;
+import org.slf4j.Logger;
 
 public class RequestLogFactory {
   

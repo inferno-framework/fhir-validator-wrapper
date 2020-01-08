@@ -1,7 +1,7 @@
 package org.mitre.inferno.utils;
 
-import org.slf4j.Logger;
 import org.eclipse.jetty.server.CustomRequestLog;
+import org.slf4j.Logger;
 import spark.embeddedserver.EmbeddedServers;
 import spark.embeddedserver.jetty.EmbeddedJettyFactory;
 
