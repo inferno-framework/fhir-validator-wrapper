@@ -25,7 +25,6 @@ public class App {
     } else {
       startApp();
     }
-
   }
 
   /**
