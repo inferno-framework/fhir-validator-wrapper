@@ -34,6 +34,16 @@ Run
 ```shell script
 docker run -p 4567:4567 hl7_validator
 ```
+
+Run with a different terminology server:
+```shell script
+docker run -p 4567:4567 --env TX_SERVER_URL=http://mytx.org/r4 hl7_validator
+```
+
+Run without terminology validation:
+```shell script
+docker run -p 4567:4567 --env DISABLE_TX=true hl7_validator
+```
 ## Contact Us
 The Inferno development team can be reached by email at inferno@groups.mitre.org.  Inferno also has a dedicated [HL7 FHIR chat channel](https://chat.fhir.org/#narrow/stream/153-inferno).
 
