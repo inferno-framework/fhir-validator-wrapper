@@ -63,7 +63,7 @@ public class Validator {
     final String fhirSpecVersion = "4.0";
     final String definitions = VersionUtilities.packageForVersion(fhirSpecVersion)
         + "#" + VersionUtilities.getCurrentVersion(fhirSpecVersion);
-    final String txServer = getTxServerURL();
+    final String txServer = getTxServerUrl();
     final String txLog = null;
     final String fhirVersion = "4.0.1";
 
@@ -138,11 +138,19 @@ public class Validator {
     return IOUtils.toByteArray(file);
   }
 
-  private String getTxServerURL() {
+  private String getTxServerUrl() {
+    if (disableTxValidation()) {
+      return null;
+    }
+
     if (System.getenv("TX_SERVER_URL") != null) {
       return System.getenv("TX_SERVER_URL");
     } else {
       return "http://tx.fhir.org";
     }
+  }
+
+  private boolean disableTxValidation() {
+    return System.getenv("DISABLE_TX") != null;
   }
 }
