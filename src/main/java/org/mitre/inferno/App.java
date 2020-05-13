@@ -41,6 +41,14 @@ public class App {
     Logger logger = LoggerFactory.getLogger(App.class);
     logger.info("Starting Server...");
     SparkUtils.createServerWithRequestLog(logger);
-    ValidatorEndpoint.getInstance();
+    ValidatorEndpoint.getInstance(getPortNumber());
+  }
+
+  private static int getPortNumber() {
+    if (System.getenv("VALIDATOR_PORT") != null) {
+      return Integer.parseInt(System.getenv("VALIDATOR_PORT"));
+    } else {
+      return 4567;
+    }
   }
 }

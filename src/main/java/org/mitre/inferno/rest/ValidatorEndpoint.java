@@ -2,6 +2,7 @@ package org.mitre.inferno.rest;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.port;
 
 import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
@@ -22,7 +23,8 @@ public class ValidatorEndpoint {
   private static ValidatorEndpoint validatorEndpoint = null;
   private static Validator _validator = null;
 
-  private ValidatorEndpoint() {
+  private ValidatorEndpoint(int portNum) {
+    port(portNum);
     createRoutes();
   }
 
@@ -31,9 +33,9 @@ public class ValidatorEndpoint {
    *
    * @return
    */
-  public static ValidatorEndpoint getInstance() {
+  public static ValidatorEndpoint getInstance(int portNum) {
     if (validatorEndpoint == null) {
-      validatorEndpoint = new ValidatorEndpoint();
+      validatorEndpoint = new ValidatorEndpoint(portNum);
     }
     return validatorEndpoint;
   }

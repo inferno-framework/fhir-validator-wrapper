@@ -93,7 +93,8 @@ public class Validator {
   }
 
   public OperationOutcome validate(byte[] resource, List<String> profile) throws Exception {
-    return this.hl7Validator.validate(null, resource, Manager.FhirFormat.JSON, profile);
+    Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
+    return this.hl7Validator.validate(null, resource, fmt, profile);
   }
 
   /**
