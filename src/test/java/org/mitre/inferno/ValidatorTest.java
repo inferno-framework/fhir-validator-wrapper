@@ -80,6 +80,17 @@ public class ValidatorTest {
   }
 
   @Test
+  void validateMultipleProfiles() {
+    try {
+      byte[] example = loadFile("us_core_patient_example.json");
+      validator.validate(example, Arrays.asList("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient", "http://hl7.org/fhir/StructureDefinition/Patient"));
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
+
+  @Test
   void getKnownIGs() {
     List<String> knownIGs = validator.getKnownIGs();
     assertTrue(knownIGs.contains("http://hl7.org/fhir/us/core"));
