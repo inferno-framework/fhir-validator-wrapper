@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -139,8 +140,7 @@ public class ValidatorEndpoint {
    * @throws Exception if the resource cannot be loaded or validated
    */
   private String validateResource(byte[] resource, String profile) throws Exception {
-    ArrayList<String> patientProfiles = new ArrayList<>();
-    patientProfiles.add(profile);
+    ArrayList<String> patientProfiles = new ArrayList<String>(Arrays.asList(profile.split(",")));
     OperationOutcome oo = validator().validate(resource, patientProfiles);
     return resourceToJson(oo);
   }

@@ -92,9 +92,9 @@ public class Validator {
         .collect(Collectors.toList());
   }
 
-  public OperationOutcome validate(byte[] resource, List<String> profile) throws Exception {
+  public OperationOutcome validate(byte[] resource, List<String> profiles) throws Exception {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
-    return this.hl7Validator.validate(null, resource, fmt, profile);
+    return this.hl7Validator.validate(null, resource, fmt, profiles);
   }
 
   /**
