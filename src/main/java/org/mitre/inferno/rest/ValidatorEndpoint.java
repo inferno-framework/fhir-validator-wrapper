@@ -1,5 +1,6 @@
 package org.mitre.inferno.rest;
 
+import static spark.Spark.before;
 import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.port;
@@ -45,6 +46,10 @@ public class ValidatorEndpoint {
    * Creates the API routes for receiving and processing HTTP requests from clients.
    */
   private void createRoutes() {
+    before((req, res) -> {
+      res.header("Access-Control-Allow-Origin", "*");
+    });
+
     post("/validate",
         (req, res) -> {
           res.type("application/fhir+json");
