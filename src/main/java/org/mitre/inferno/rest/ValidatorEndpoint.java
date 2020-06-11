@@ -2,6 +2,7 @@ package org.mitre.inferno.rest;
 
 import static spark.Spark.before;
 import static spark.Spark.get;
+import static spark.Spark.options;
 import static spark.Spark.post;
 import static spark.Spark.port;
 
@@ -48,7 +49,13 @@ public class ValidatorEndpoint {
   private void createRoutes() {
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
     });
+
+    options("*",
+        (req, res) -> {
+          return "";
+        });
 
     post("/validate",
         (req, res) -> {
