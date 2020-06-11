@@ -50,6 +50,7 @@ public class ValidatorEndpoint {
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+      res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type");
     });
 
     options("*",
