@@ -47,12 +47,14 @@ public class ValidatorEndpoint {
    * Creates the API routes for receiving and processing HTTP requests from clients.
    */
   private void createRoutes() {
+    // This adds permissive CORS headers to all requests
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
       res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type");
     });
 
+    // This responds to OPTIONS requests, used by browsers to "preflight" check CORS requests, with a 200 OK response with no content and the CORS headers above
     options("*",
         (req, res) -> {
           return "";
