@@ -93,7 +93,7 @@ public class ValidatorTest {
   @Test
   void getKnownIGs() {
     List<String> knownIGs = validator.getKnownIGs();
-    assertTrue(knownIGs.contains("http://hl7.org/fhir/us/core"));
+    assertTrue(knownIGs.contains("hl7.fhir.us.core#3.1.0"));
     assertTrue(knownIGs.size() > 10);
   }
 
