@@ -3,8 +3,8 @@ package org.mitre.inferno.rest;
 import static spark.Spark.before;
 import static spark.Spark.get;
 import static spark.Spark.options;
-import static spark.Spark.post;
 import static spark.Spark.port;
+import static spark.Spark.post;
 
 import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
@@ -57,7 +57,8 @@ public class ValidatorEndpoint {
       res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type");
     });
 
-    // This responds to OPTIONS requests, used by browsers to "preflight" check CORS requests, with a 200 OK response with no content and the CORS headers above
+    // This responds to OPTIONS requests, used by browsers to "preflight" check CORS requests,
+    // with a 200 OK response with no content and the CORS headers above
     options("*",
         (req, res) -> {
           return "";
@@ -87,6 +88,26 @@ public class ValidatorEndpoint {
           return getIGs();
         });
 
+    get("/profiles-by-ig",
+        (req, res) -> {
+          res.type("application/json");
+          return new Gson().toJson(validator.getProfilesByIg());
+        });
+
+    post("/ig",
+        (req, res) -> {
+          res.type("application/json");
+          try {
+            loadIg(req.queryParams("src"));
+            res.status(200);
+            return "";
+          } catch (Exception e) {
+            res.status(500);
+            e.printStackTrace();
+            return "";
+          }
+        });
+
     post("/profile",
         (req, res) -> {
           byte[] profile = req.bodyAsBytes();
@@ -99,6 +120,17 @@ public class ValidatorEndpoint {
             return "";
           }
         });
+  }
+
+  /**
+   * Handles loading FHIR IGs into the validator or fetching them from the packages.fhir.org
+   * repository if they don't exist.
+   *
+   * @param src the FHIR IG to be loaded
+   * @throws Exception if the IG could not be loaded
+   */
+  private void loadIg(String src) throws Exception {
+    validator.loadIg(src);
   }
 
   /**
