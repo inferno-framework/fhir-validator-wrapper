@@ -1,22 +1,34 @@
 package org.mitre.inferno;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.context.SimpleWorkerContext;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.model.FhirPublication;
+import org.hl7.fhir.r5.model.ImplementationGuide;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
-import org.hl7.fhir.validation.ValidationEngine;
+import org.hl7.fhir.utilities.TextFile;
 import org.hl7.fhir.utilities.VersionUtilities;
 import org.hl7.fhir.utilities.cache.FilesystemPackageCacheManager;
+import org.hl7.fhir.utilities.cache.NpmPackage;
 import org.hl7.fhir.utilities.cache.ToolsVersion;
+import org.hl7.fhir.utilities.json.JSONUtil;
+import org.hl7.fhir.validation.ValidationEngine;
 
 public class Validator {
   private final ValidationEngine hl7Validator;
@@ -65,7 +77,7 @@ public class Validator {
 
   public OperationOutcome validate(byte[] resource, List<String> profiles) throws Exception {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
-    return this.hl7Validator.validate(null, resource, fmt, profiles);
+    return hl7Validator.validate(null, resource, fmt, profiles);
   }
 
   /**
@@ -73,8 +85,10 @@ public class Validator {
    *
    * @return the list of IGs.
    */
-  public List<String> getKnownIGs() {
-    return packageManager.listPackages();
+  public Map<String, String> getKnownIGs() throws IOException {
+    Map<String, String> igs = new HashMap<>();
+    packageManager.listAllIds(igs);
+    return igs;
   }
 
   /**
@@ -84,6 +98,53 @@ public class Validator {
   public void loadProfile(Resource profile) {
     SimpleWorkerContext context = hl7Validator.getContext();
     context.cacheResource(profile);
+  }
+
+  /**
+   * Load a profile into the validator.
+   *
+   * @param src the FHIR IG to be loaded
+   */
+  public void loadIg(String src) throws Exception {
+    hl7Validator.loadIg(src, true);
+  }
+
+  /**
+   * Get a mapping from IG URL to a list of profile URLs supported by the IG.
+   *
+   * @return a mapping from IG URL to a list of profile URLs supported by the IG.
+   */
+  public Map<String, List<String>> getProfilesByIg() {
+    List<ImplementationGuide> igs = hl7Validator.getContext().allImplementationGuides();
+    return igs
+        .stream()
+        .collect(Collectors.toMap(
+            ig -> ig.getPackageId() + (ig.hasVersion() ? "#" + ig.getVersion() : ""),
+            ig -> {
+              JsonObject index;
+              try {
+                NpmPackage npm = packageManager.loadPackage(ig.getPackageId(), ig.getVersion());
+                InputStream in = npm.load(".index.json");
+                index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
+              } catch (IOException e) {
+                return new ArrayList<>();
+              }
+
+              JsonArray files = index.getAsJsonArray("files");
+              List<String> profileUrls = new ArrayList<>();
+              for (JsonElement f : files) {
+                JsonObject file = (JsonObject) f;
+                String type = JSONUtil.str(file, "resourceType");
+                String url = JSONUtil.str(file, "url");
+                if (type.equals("StructureDefinition")) {
+                  profileUrls.add(url);
+                }
+              }
+              Collections.sort(profileUrls);
+              return profileUrls;
+            },
+            (existing, replacement) -> existing
+        ));
   }
 
   /**

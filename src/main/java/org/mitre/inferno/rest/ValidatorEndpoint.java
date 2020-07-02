@@ -132,7 +132,7 @@ public class ValidatorEndpoint {
    *
    * @return a list of IG URLs
    */
-  private String getIGs() {
+  private String getIGs() throws IOException {
     return new Gson().toJson(validator.getKnownIGs());
   }
 

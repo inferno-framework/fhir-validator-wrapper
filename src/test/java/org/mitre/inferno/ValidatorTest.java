@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
@@ -97,9 +97,9 @@ public class ValidatorTest {
   }
 
   @Test
-  void getKnownIGs() {
-    List<String> knownIGs = validator.getKnownIGs();
-    assertTrue(knownIGs.contains("hl7.fhir.r4.core#4.0.1"));
+  void getKnownIGs() throws IOException {
+    Set<String> knownIGs = validator.getKnownIGs().keySet();
+    assertTrue(knownIGs.contains("hl7.fhir.r4.core"));
   }
 
   boolean isProfileLoaded(String profile) {
