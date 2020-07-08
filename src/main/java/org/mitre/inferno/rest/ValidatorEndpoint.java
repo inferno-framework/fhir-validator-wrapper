@@ -5,6 +5,7 @@ import static spark.Spark.get;
 import static spark.Spark.options;
 import static spark.Spark.port;
 import static spark.Spark.post;
+import static spark.Spark.put;
 
 import com.google.gson.Gson;
 import java.io.ByteArrayOutputStream;
@@ -53,7 +54,7 @@ public class ValidatorEndpoint {
     // This adds permissive CORS headers to all requests
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+      res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
       res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type");
     });
 
@@ -94,11 +95,11 @@ public class ValidatorEndpoint {
           return new Gson().toJson(validator.getProfilesByIg());
         });
 
-    post("/ig",
+    put("/igs/:id",
         (req, res) -> {
           res.type("application/json");
           try {
-            loadIg(req.queryParams("src"));
+            loadIg(req.params("id"));
             res.status(200);
             return "";
           } catch (Exception e) {
