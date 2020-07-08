@@ -100,13 +100,34 @@ public class Validator {
     context.cacheResource(profile);
   }
 
+  private List<String> getProfileUrls(String id) throws IOException {
+    NpmPackage npm = packageManager.loadPackage(id, null);
+    InputStream in = npm.load(".index.json");
+    JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
+
+    JsonArray files = index.getAsJsonArray("files");
+    List<String> profileUrls = new ArrayList<>();
+    for (JsonElement f : files) {
+      JsonObject file = (JsonObject) f;
+      String type = JSONUtil.str(file, "resourceType");
+      String url = JSONUtil.str(file, "url");
+      if (type.equals("StructureDefinition")) {
+        profileUrls.add(url);
+      }
+    }
+    Collections.sort(profileUrls);
+    return profileUrls;
+  }
+
   /**
-   * Load a profile into the validator.
+   * Load an IG into the validator.
    *
-   * @param src the FHIR IG to be loaded
+   * @param id the package ID of the FHIR IG to be loaded
+   * @return a list of profile URLs for the loaded IG
    */
-  public void loadIg(String src) throws Exception {
-    hl7Validator.loadIg(src, true);
+  public List<String> loadIg(String id) throws Exception {
+    hl7Validator.loadIg(id, true);
+    return getProfileUrls(id);
   }
 
   /**
@@ -121,27 +142,11 @@ public class Validator {
         .collect(Collectors.toMap(
             ig -> ig.getPackageId() + (ig.hasVersion() ? "#" + ig.getVersion() : ""),
             ig -> {
-              JsonObject index;
               try {
-                NpmPackage npm = packageManager.loadPackage(ig.getPackageId(), ig.getVersion());
-                InputStream in = npm.load(".index.json");
-                index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
+                return getProfileUrls(ig.getPackageId());
               } catch (IOException e) {
                 return new ArrayList<>();
               }
-
-              JsonArray files = index.getAsJsonArray("files");
-              List<String> profileUrls = new ArrayList<>();
-              for (JsonElement f : files) {
-                JsonObject file = (JsonObject) f;
-                String type = JSONUtil.str(file, "resourceType");
-                String url = JSONUtil.str(file, "url");
-                if (type.equals("StructureDefinition")) {
-                  profileUrls.add(url);
-                }
-              }
-              Collections.sort(profileUrls);
-              return profileUrls;
             },
             (existing, replacement) -> existing
         ));
