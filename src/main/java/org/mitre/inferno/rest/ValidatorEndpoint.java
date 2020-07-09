@@ -12,9 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
 import org.hl7.fhir.r5.elementmodel.Manager.FhirFormat;
 import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.formats.IParser;
@@ -22,10 +19,12 @@ import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.Resource;
 import org.mitre.inferno.Validator;
+import spark.ResponseTransformer;
 
 public class ValidatorEndpoint {
   private static ValidatorEndpoint validatorEndpoint = null;
   private final Validator validator;
+  private static final ResponseTransformer TO_JSON = new Gson()::toJson;
 
   private ValidatorEndpoint(Validator validator, int portNum) {
     this.validator = validator;
@@ -69,32 +68,21 @@ public class ValidatorEndpoint {
           return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
         });
 
-    get("/resources", (req, res) -> resourcesList());
+    get("/resources", (req, res) -> validator.getResources(), TO_JSON);
 
-    get("/profiles", (req, res) -> getProfiles());
+    get("/profiles", (req, res) -> validator.getStructures(), TO_JSON);
 
-    get("/igs", (req, res) -> getIGs());
+    get("/igs", (req, res) -> validator.getKnownIGs(), TO_JSON);
 
-    get("/profiles-by-ig", (req, res) -> new Gson().toJson(validator.getProfilesByIg()));
+    get("/profiles-by-ig", (req, res) -> validator.getProfilesByIg(), TO_JSON);
 
-    put("/igs/:id", (req, res) -> loadIg(req.params("id")));
+    put("/igs/:id", (req, res) -> validator.loadIg(req.params("id")), TO_JSON);
 
     post("/profile",
         (req, res) -> {
           loadProfile(req.bodyAsBytes());
           return "";
         });
-  }
-
-  /**
-   * Handles loading FHIR IGs into the validator or fetching them from the packages.fhir.org
-   * repository if they don't exist.
-   *
-   * @param id the package ID of the FHIR IG to be loaded
-   * @throws Exception if the IG could not be loaded
-   */
-  private String loadIg(String id) throws Exception {
-    return new Gson().toJson(validator.loadIg(id));
   }
 
   /**
@@ -110,29 +98,6 @@ public class ValidatorEndpoint {
   }
 
   /**
-   * Handles returning the currently loaded profiles in the validator.
-   *
-   * @return a list of profile URLs
-   */
-  private String getProfiles() {
-    LinkedHashSet<String> structuresDeduplicated = new LinkedHashSet<String>();
-    List<String> structures = new ArrayList<String>();
-    structuresDeduplicated.addAll(validator.getStructures());
-    structures.addAll(structuresDeduplicated);
-    Collections.sort(structures);
-    return new Gson().toJson(structures);
-  }
-
-  /**
-   * Handles returning a list of available IGs that could be loaded.
-   *
-   * @return a list of IG URLs
-   */
-  private String getIGs() throws IOException {
-    return new Gson().toJson(validator.getKnownIGs());
-  }
-
-  /**
    * Handles validating resources against a profile.
    *
    * @param resource the resource to be validated
@@ -144,16 +109,6 @@ public class ValidatorEndpoint {
     ArrayList<String> patientProfiles = new ArrayList<String>(Arrays.asList(profile.split(",")));
     OperationOutcome oo = validator.validate(resource, patientProfiles);
     return resourceToJson(oo);
-  }
-
-  /**
-   * Returns the list of FHIR Resources supported by the validator.
-   * @return
-   */
-  private String resourcesList() {
-    LinkedHashSet<String> resourcesDeduplicated = new LinkedHashSet<String>();
-    resourcesDeduplicated.addAll(validator.getResources());
-    return new Gson().toJson(resourcesDeduplicated);
   }
 
   /**
