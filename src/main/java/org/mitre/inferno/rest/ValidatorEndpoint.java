@@ -23,25 +23,18 @@ import org.hl7.fhir.r5.model.Resource;
 import org.mitre.inferno.Validator;
 
 public class ValidatorEndpoint {
-  private static ValidatorEndpoint validatorEndpoint = null;
   private final Validator validator;
 
-  private ValidatorEndpoint(int portNum) {
-    validator = new Validator("./igs/package");
+  /**
+   * Creates a new ValidatorEndpoint listening on the given port.
+   *
+   * @param portNum the port to listen on
+   * @throws Exception if the validator could not be created
+   */
+  public ValidatorEndpoint(int portNum) throws Exception {
+    validator = new Validator();
     port(portNum);
     createRoutes();
-  }
-
-  /**
-   * Get the existing validatorEndpoint or create one if it does not already exist.
-   *
-   * @return
-   */
-  public static ValidatorEndpoint getInstance(int portNum) {
-    if (validatorEndpoint == null) {
-      validatorEndpoint = new ValidatorEndpoint(portNum);
-    }
-    return validatorEndpoint;
   }
 
   /**
