@@ -31,7 +31,13 @@ public class App {
    * Only used for getting the FHIR artifacts cached.
    */
   private static void initializeValidator() {
-    new Validator("./igs/package");
+    Logger logger = LoggerFactory.getLogger(App.class);
+    try {
+      new Validator();
+    } catch (Exception e) {
+      e.printStackTrace();
+      logger.error("There was an error initializing the validator.");
+    }
   }
 
   /**
@@ -41,7 +47,12 @@ public class App {
     Logger logger = LoggerFactory.getLogger(App.class);
     logger.info("Starting Server...");
     SparkUtils.createServerWithRequestLog(logger);
-    ValidatorEndpoint.getInstance(getPortNumber());
+    try {
+      new ValidatorEndpoint(getPortNumber());
+    } catch (Exception e) {
+      e.printStackTrace();
+      logger.error("There was an error setting up the validator endpoint.");
+    }
   }
 
   private static int getPortNumber() {

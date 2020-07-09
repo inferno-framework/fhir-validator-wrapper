@@ -2,7 +2,6 @@ package org.mitre.inferno;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
@@ -19,36 +18,13 @@ import org.hl7.fhir.utilities.cache.FilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.cache.ToolsVersion;
 
 public class Validator {
-  ValidationEngine hl7Validator;
-  FilesystemPackageCacheManager packageManager;
+  private final ValidationEngine hl7Validator;
+  private final FilesystemPackageCacheManager packageManager;
 
   /**
    * The Validator is capable of validating FHIR Resources against FHIR Profiles.
-   *
-   * @param igFile The igFile the validator is loaded with.
    */
-  public Validator(String igFile) {
-    try {
-      this.createHL7Validator(igFile);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Get the PackageManager used by the validator
-   *
-   * <p>This can be used to retrieve the IGs which can be loaded.
-   *
-   * @return
-   */
-  /**
-   * Creates the HL7 Validator to which can then be used for validation.
-   *
-   * @param igFile The name of the igFile to load
-   * @throws Exception If the validator cannot be created
-   */
-  private void createHL7Validator(String igFile) throws Exception {
+  public Validator() throws Exception {
     final String fhirSpecVersion = "4.0";
     final String definitions = VersionUtilities.packageForVersion(fhirSpecVersion)
         + "#" + VersionUtilities.getCurrentVersion(fhirSpecVersion);
@@ -57,7 +33,7 @@ public class Validator {
     final String fhirVersion = "4.0.1";
 
     hl7Validator = new ValidationEngine(definitions);
-    hl7Validator.loadIg(igFile, true);
+    hl7Validator.loadIg("hl7.fhir.us.core#3.1.0", true);
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);

@@ -12,11 +12,17 @@ import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.model.Resource;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 
 public class ValidatorTest {
-  private final Validator validator = new Validator("igs/package");
+  private static Validator validator;
+
+  @BeforeAll
+  static void setUp() throws Exception {
+    validator = new Validator();
+  }
 
   @Test
   void getStructures() {
