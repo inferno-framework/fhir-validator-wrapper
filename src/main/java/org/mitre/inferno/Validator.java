@@ -163,7 +163,7 @@ public class Validator {
     return igs
         .stream()
         .collect(Collectors.toMap(
-            ig -> ig.getPackageId() + (ig.hasVersion() ? "#" + ig.getVersion() : ""),
+            ImplementationGuide::getPackageId,
             ig -> {
               try {
                 return getProfileUrls(ig.getPackageId());
