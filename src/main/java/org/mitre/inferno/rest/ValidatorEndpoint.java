@@ -8,13 +8,11 @@ import static spark.Spark.post;
 import static spark.Spark.put;
 
 import com.google.gson.Gson;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.hl7.fhir.r5.elementmodel.Manager.FhirFormat;
 import org.hl7.fhir.r5.formats.FormatUtilities;
-import org.hl7.fhir.r5.formats.IParser;
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.Resource;
@@ -106,21 +104,8 @@ public class ValidatorEndpoint {
    * @throws Exception if the resource cannot be loaded or validated
    */
   private String validateResource(byte[] resource, String profile) throws Exception {
-    ArrayList<String> patientProfiles = new ArrayList<String>(Arrays.asList(profile.split(",")));
+    List<String> patientProfiles = Arrays.asList(profile.split(","));
     OperationOutcome oo = validator.validate(resource, patientProfiles);
-    return resourceToJson(oo);
-  }
-
-  /**
-   * Serializes a FHIR resource to its JSON representation.
-   * @param resource the resource to be serialized
-   * @return the serialized FHIR resource
-   * @throws IOException if the resource fails to be serialized
-   */
-  private String resourceToJson(Resource resource) throws IOException {
-    IParser parser = new JsonParser();
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    parser.compose(baos, resource);
-    return baos.toString();
+    return new JsonParser().composeString(oo);
   }
 }
