@@ -58,7 +58,11 @@ public class Validator {
   }
 
   public List<String> getResources() {
-    return hl7Validator.getContext().getResourceNames();
+    return hl7Validator.getContext().getResourceNames()
+        .stream()
+        .sorted()
+        .distinct()
+        .collect(Collectors.toList());
   }
 
   /**
@@ -71,6 +75,8 @@ public class Validator {
     return structures
         .stream()
         .map(StructureDefinition::getUrl)
+        .sorted()
+        .distinct()
         .collect(Collectors.toList());
   }
 
