@@ -24,9 +24,10 @@ import org.mitre.inferno.Validator;
 
 public class ValidatorEndpoint {
   private static ValidatorEndpoint validatorEndpoint = null;
-  private static Validator _validator = null;
+  private final Validator validator;
 
   private ValidatorEndpoint(int portNum) {
+    validator = new Validator("./igs/package");
     port(portNum);
     createRoutes();
   }
@@ -107,7 +108,7 @@ public class ValidatorEndpoint {
   private void loadProfile(byte[] profile) throws IOException {
     FhirFormat fmt = FormatUtilities.determineFormat(profile);
     Resource resource = FormatUtilities.makeParser(fmt).parse(profile);
-    validator().loadProfile(resource);
+    validator.loadProfile(resource);
   }
 
   /**
@@ -118,7 +119,7 @@ public class ValidatorEndpoint {
   private String getProfiles() {
     LinkedHashSet<String> structuresDeduplicated = new LinkedHashSet<String>();
     List<String> structures = new ArrayList<String>();
-    structuresDeduplicated.addAll(validator().getStructures());
+    structuresDeduplicated.addAll(validator.getStructures());
     structures.addAll(structuresDeduplicated);
     Collections.sort(structures);
     return new Gson().toJson(structures);
@@ -130,20 +131,7 @@ public class ValidatorEndpoint {
    * @return a list of IG URLs
    */
   private String getIGs() {
-    return new Gson().toJson(validator().getKnownIGs());
-  }
-
-  /**
-   * Returns the validator associated with this ValidatorEndpoint.
-   * <p>Creates a new Validator if one has not yet been created.</p>
-   *
-   * @return
-   */
-  private Validator validator() {
-    if (_validator == null) {
-      _validator = new Validator("./igs/package");
-    }
-    return _validator;
+    return new Gson().toJson(validator.getKnownIGs());
   }
 
   /**
@@ -156,7 +144,7 @@ public class ValidatorEndpoint {
    */
   private String validateResource(byte[] resource, String profile) throws Exception {
     ArrayList<String> patientProfiles = new ArrayList<String>(Arrays.asList(profile.split(",")));
-    OperationOutcome oo = validator().validate(resource, patientProfiles);
+    OperationOutcome oo = validator.validate(resource, patientProfiles);
     return resourceToJson(oo);
   }
 
@@ -166,7 +154,7 @@ public class ValidatorEndpoint {
    */
   private String resourcesList() {
     LinkedHashSet<String> resourcesDeduplicated = new LinkedHashSet<String>();
-    resourcesDeduplicated.addAll(validator().getResources());
+    resourcesDeduplicated.addAll(validator.getResources());
     return new Gson().toJson(resourcesDeduplicated);
   }
 
