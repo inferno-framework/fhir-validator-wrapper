@@ -99,9 +99,7 @@ public class ValidatorEndpoint {
         (req, res) -> {
           res.type("application/json");
           try {
-            loadIg(req.params("id"));
-            res.status(200);
-            return "";
+            return loadIg(req.params("id"));
           } catch (Exception e) {
             res.status(500);
             e.printStackTrace();
@@ -127,11 +125,11 @@ public class ValidatorEndpoint {
    * Handles loading FHIR IGs into the validator or fetching them from the packages.fhir.org
    * repository if they don't exist.
    *
-   * @param src the FHIR IG to be loaded
+   * @param id the package ID of the FHIR IG to be loaded
    * @throws Exception if the IG could not be loaded
    */
-  private void loadIg(String src) throws Exception {
-    validator.loadIg(src);
+  private String loadIg(String id) throws Exception {
+    return new Gson().toJson(validator.loadIg(id));
   }
 
   /**
