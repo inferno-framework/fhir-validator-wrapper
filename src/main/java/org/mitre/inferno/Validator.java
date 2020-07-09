@@ -57,6 +57,11 @@ public class Validator {
     packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
   }
 
+  /**
+   * Lists the names of resources defined for this version of the validator.
+   *
+   * @return a sorted list of distinct resource names
+   */
   public List<String> getResources() {
     return hl7Validator.getContext().getResourceNames()
         .stream()
@@ -68,7 +73,7 @@ public class Validator {
   /**
    * Lists the StructureDefinitions loaded in the validator.
    *
-   * @return structures the list of structures
+   * @return a sorted list of distinct structure canonicals
    */
   public List<String> getStructures() {
     List<StructureDefinition> structures = hl7Validator.getContext().getStructures();
@@ -80,15 +85,23 @@ public class Validator {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Validates the given resource against the given list of profiles.
+   *
+   * @param resource a byte array representation of a FHIR resource
+   * @param profiles a list of profile URLs to validate against
+   * @return an OperationOutcome resource representing the result of the validation operation
+   * @throws Exception if there was an error validating the resource
+   */
   public OperationOutcome validate(byte[] resource, List<String> profiles) throws Exception {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
     return hl7Validator.validate(null, resource, fmt, profiles);
   }
 
   /**
-   * Provides a list of known IGs that can be retrieved and loaded.
+   * Provides a map of known IGs that can be retrieved and loaded.
    *
-   * @return the list of IGs.
+   * @return a map containing each known IG ID and its corresponding canonical URL.
    */
   public Map<String, String> getKnownIGs() throws IOException {
     Map<String, String> igs = new HashMap<>();
