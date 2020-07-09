@@ -56,14 +56,12 @@ public class ValidatorEndpoint {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
       res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type");
+      res.type("application/json");
     });
 
     // This responds to OPTIONS requests, used by browsers to "preflight" check CORS requests,
     // with a 200 OK response with no content and the CORS headers above
-    options("*",
-        (req, res) -> {
-          return "";
-        });
+    options("*", (req, res) -> "");
 
     post("/validate",
         (req, res) -> {
@@ -71,53 +69,20 @@ public class ValidatorEndpoint {
           return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
         });
 
-    get("/resources",
-        (req, res) -> {
-          res.type("application/json");
-          return resourcesList();
-        });
+    get("/resources", (req, res) -> resourcesList());
 
-    get("/profiles",
-        (req, res) -> {
-          res.type("application/json");
-          return getProfiles();
-        });
+    get("/profiles", (req, res) -> getProfiles());
 
-    get("/igs",
-        (req, res) -> {
-          res.type("application/json");
-          return getIGs();
-        });
+    get("/igs", (req, res) -> getIGs());
 
-    get("/profiles-by-ig",
-        (req, res) -> {
-          res.type("application/json");
-          return new Gson().toJson(validator.getProfilesByIg());
-        });
+    get("/profiles-by-ig", (req, res) -> new Gson().toJson(validator.getProfilesByIg()));
 
-    put("/igs/:id",
-        (req, res) -> {
-          res.type("application/json");
-          try {
-            return loadIg(req.params("id"));
-          } catch (Exception e) {
-            res.status(500);
-            e.printStackTrace();
-            return "";
-          }
-        });
+    put("/igs/:id", (req, res) -> loadIg(req.params("id")));
 
     post("/profile",
         (req, res) -> {
-          byte[] profile = req.bodyAsBytes();
-          try {
-            loadProfile(profile);
-            res.status(200);
-            return "";
-          } catch (IOException e) {
-            res.status(500);
-            return "";
-          }
+          loadProfile(req.bodyAsBytes());
+          return "";
         });
   }
 
