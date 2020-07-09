@@ -42,17 +42,6 @@ public class Validator {
    *
    * @return
    */
-  private FilesystemPackageCacheManager getPackageManager() {
-    if (packageManager == null) {
-      try {
-        packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    return packageManager;
-  }
-
   /**
    * Creates the HL7 Validator to which can then be used for validation.
    *
@@ -73,6 +62,8 @@ public class Validator {
     hl7Validator.setNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.prepare();
+
+    packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
   }
 
   public List<String> getResources() {
@@ -103,7 +94,7 @@ public class Validator {
    * @return the list of IGs.
    */
   public List<String> getKnownIGs() {
-    return getPackageManager().listPackages();
+    return packageManager.listPackages();
   }
 
   /**
