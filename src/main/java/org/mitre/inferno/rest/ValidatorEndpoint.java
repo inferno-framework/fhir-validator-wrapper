@@ -70,17 +70,17 @@ public class ValidatorEndpoint {
 
     get("/profiles", (req, res) -> validator.getStructures(), TO_JSON);
 
-    get("/igs", (req, res) -> validator.getKnownIGs(), TO_JSON);
-
-    get("/profiles-by-ig", (req, res) -> validator.getProfilesByIg(), TO_JSON);
-
-    put("/igs/:id", (req, res) -> validator.loadIg(req.params("id")), TO_JSON);
-
-    post("/profile",
+    post("/profiles",
         (req, res) -> {
           loadProfile(req.bodyAsBytes());
           return "";
         });
+
+    get("/profiles-by-ig", (req, res) -> validator.getProfilesByIg(), TO_JSON);
+
+    get("/igs", (req, res) -> validator.getKnownIGs(), TO_JSON);
+
+    put("/igs/:id", (req, res) -> validator.loadIg(req.params("id")), TO_JSON);
   }
 
   /**
