@@ -8,14 +8,10 @@ import static spark.Spark.post;
 import static spark.Spark.put;
 
 import com.google.gson.Gson;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.hl7.fhir.r5.elementmodel.Manager.FhirFormat;
-import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.OperationOutcome;
-import org.hl7.fhir.r5.model.Resource;
 import org.mitre.inferno.Validator;
 import spark.ResponseTransformer;
 
@@ -72,7 +68,7 @@ public class ValidatorEndpoint {
 
     post("/profiles",
         (req, res) -> {
-          loadProfile(req.bodyAsBytes());
+          validator.loadProfile(req.bodyAsBytes());
           return "";
         });
 
@@ -81,18 +77,6 @@ public class ValidatorEndpoint {
     get("/igs", (req, res) -> validator.getKnownIGs(), TO_JSON);
 
     put("/igs/:id", (req, res) -> validator.loadIg(req.params("id")), TO_JSON);
-  }
-
-  /**
-   * Handles loading FHIR profiles into the validator.
-   *
-   * @param profile the FHIR profile to be loaded
-   * @throws IOException if the profile could not be loaded
-   */
-  private void loadProfile(byte[] profile) throws IOException {
-    FhirFormat fmt = FormatUtilities.determineFormat(profile);
-    Resource resource = FormatUtilities.makeParser(fmt).parse(profile);
-    validator.loadProfile(resource);
   }
 
   /**

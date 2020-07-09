@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.hl7.fhir.r5.context.SimpleWorkerContext;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.model.FhirPublication;
@@ -93,11 +92,13 @@ public class Validator {
 
   /**
    * Load a profile into the validator.
+   *
    * @param profile the profile to be loaded
    */
-  public void loadProfile(Resource profile) {
-    SimpleWorkerContext context = hl7Validator.getContext();
-    context.cacheResource(profile);
+  public void loadProfile(byte[] profile) throws IOException {
+    Manager.FhirFormat fmt = FormatUtilities.determineFormat(profile);
+    Resource resource = FormatUtilities.makeParser(fmt).parse(profile);
+    hl7Validator.getContext().cacheResource(resource);
   }
 
   private List<String> getProfileUrls(String id) throws IOException {
@@ -162,9 +163,7 @@ public class Validator {
    * @throws IOException if the file fails to load
    */
   public void loadProfileFromFile(String src) throws IOException {
-    byte[] resource = loadResourceFromFile(src);
-    Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
-    Resource profile = FormatUtilities.makeParser(fmt).parse(resource);
+    byte[] profile = loadResourceFromFile(src);
     loadProfile(profile);
   }
 

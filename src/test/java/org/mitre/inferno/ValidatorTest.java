@@ -11,9 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
-import org.hl7.fhir.r5.elementmodel.Manager;
-import org.hl7.fhir.r5.formats.FormatUtilities;
-import org.hl7.fhir.r5.model.Resource;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -49,12 +46,10 @@ public class ValidatorTest {
           .getClassLoader()
           .getResource("profile_fixture.json");
       byte[] profile = IOUtils.toByteArray(fixture);
-      Manager.FhirFormat fmt = FormatUtilities.determineFormat(profile);
-      Resource resource = FormatUtilities.makeParser(fmt).parse(profile);
       String profileUrl = "http://hl7.org/fhir/StructureDefinition/blah";
       boolean condition = isProfileLoaded(profileUrl);
       assertFalse(condition);
-      validator.loadProfile(resource);
+      validator.loadProfile(profile);
       condition = isProfileLoaded(profileUrl);
       assertTrue(condition);
     } catch (IOException e) {
