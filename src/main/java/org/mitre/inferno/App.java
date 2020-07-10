@@ -35,8 +35,8 @@ public class App {
     try {
       new Validator();
     } catch (Exception e) {
-      e.printStackTrace();
-      logger.error("There was an error initializing the validator.");
+      logger.error("There was an error initializing the validator:", e);
+      System.exit(1);
     }
   }
 
@@ -50,8 +50,8 @@ public class App {
     try {
       new ValidatorEndpoint(getPortNumber());
     } catch (Exception e) {
-      e.printStackTrace();
-      logger.error("There was an error setting up the validator endpoint.");
+      logger.error("There was an error setting up the validator endpoint:", e);
+      System.exit(1);
     }
   }
 
