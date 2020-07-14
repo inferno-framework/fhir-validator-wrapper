@@ -13,14 +13,14 @@ import org.hl7.fhir.r5.model.FhirPublication;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
-import org.hl7.fhir.r5.validation.ValidationEngine;
+import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.utilities.VersionUtilities;
-import org.hl7.fhir.utilities.cache.PackageCacheManager;
+import org.hl7.fhir.utilities.cache.FilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.cache.ToolsVersion;
 
 public class Validator {
   ValidationEngine hl7Validator;
-  PackageCacheManager packageManager;
+  FilesystemPackageCacheManager packageManager;
 
   /**
    * The Validator is capable of validating FHIR Resources against FHIR Profiles.
@@ -42,10 +42,10 @@ public class Validator {
    *
    * @return
    */
-  private PackageCacheManager getPackageManager() {
+  private FilesystemPackageCacheManager getPackageManager() {
     if (packageManager == null) {
       try {
-        packageManager = new PackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
+        packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -103,12 +103,7 @@ public class Validator {
    * @return the list of IGs.
    */
   public List<String> getKnownIGs() {
-    try {
-      return getPackageManager().getUrls();
-    } catch (IOException e) {
-      e.printStackTrace();
-      return Arrays.asList("Failed to retrieve Implementation Guides");
-    }
+    return getPackageManager().listPackages();
   }
 
   /**
