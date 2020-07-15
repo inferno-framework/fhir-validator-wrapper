@@ -26,20 +26,22 @@ public class ValidatorEndpoint {
   private static ValidatorEndpoint validatorEndpoint = null;
   private final Validator validator;
 
-  private ValidatorEndpoint(int portNum) throws Exception {
-    validator = new Validator("./igs/package");
+  private ValidatorEndpoint(Validator validator, int portNum) {
+    this.validator = validator;
     port(portNum);
     createRoutes();
   }
 
   /**
-   * Get the existing validatorEndpoint or create one if it does not already exist.
+   * Get the existing ValidatorEndpoint or create one if it does not already exist.
    *
-   * @return
+   * @param validator the Validator that should be used for this endpoint
+   * @param portNum the port that the ValidatorEndpoint should listen on
+   * @return the singleton ValidatorEndpoint
    */
-  public static ValidatorEndpoint getInstance(int portNum) throws Exception {
+  public static ValidatorEndpoint getInstance(Validator validator, int portNum) {
     if (validatorEndpoint == null) {
-      validatorEndpoint = new ValidatorEndpoint(portNum);
+      validatorEndpoint = new ValidatorEndpoint(validator, portNum);
     }
     return validatorEndpoint;
   }
