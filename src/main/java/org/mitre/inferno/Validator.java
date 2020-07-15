@@ -2,6 +2,7 @@ package org.mitre.inferno;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
@@ -22,9 +23,12 @@ public class Validator {
   private final FilesystemPackageCacheManager packageManager;
 
   /**
-   * The Validator is capable of validating FHIR Resources against FHIR Profiles.
+   * Creates the HL7 Validator to which can then be used for validation.
+   *
+   * @param igFile The igFile the validator is loaded with.
+   * @throws Exception If the validator cannot be created
    */
-  public Validator() throws Exception {
+  public Validator(String igFile) throws Exception {
     final String fhirSpecVersion = "4.0";
     final String definitions = VersionUtilities.packageForVersion(fhirSpecVersion)
         + "#" + VersionUtilities.getCurrentVersion(fhirSpecVersion);
@@ -33,7 +37,7 @@ public class Validator {
     final String fhirVersion = "4.0.1";
 
     hl7Validator = new ValidationEngine(definitions);
-    hl7Validator.loadIg("hl7.fhir.us.core#3.1.0", true);
+    hl7Validator.loadIg(igFile, true);
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
