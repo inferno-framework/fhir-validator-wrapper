@@ -24,6 +24,17 @@ To build and run the test suite:
 gradlew.bat build check test
 ```
 
+To run the app:
+
+```shell script
+./gradlew run
+```
+
+The port can also be set through the environment
+```shell script
+VALIDATOR_PORT=8080 ./gradlew run
+```
+
 ## Running with Docker
 
 Build
