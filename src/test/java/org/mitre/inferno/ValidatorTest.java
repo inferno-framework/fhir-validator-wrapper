@@ -21,7 +21,7 @@ public class ValidatorTest {
 
   @BeforeAll
   static void setUp() throws Exception {
-    validator = new Validator();
+    validator = new Validator("./igs/package");
   }
 
   @Test

@@ -33,7 +33,7 @@ public class App {
   private static void initializeValidator() {
     Logger logger = LoggerFactory.getLogger(App.class);
     try {
-      new Validator();
+      new Validator("./igs/package");
     } catch (Exception e) {
       logger.error("There was an error initializing the validator:", e);
       System.exit(1);
@@ -48,7 +48,7 @@ public class App {
     logger.info("Starting Server...");
     SparkUtils.createServerWithRequestLog(logger);
     try {
-      new ValidatorEndpoint(getPortNumber());
+      ValidatorEndpoint.getInstance(getPortNumber());
     } catch (Exception e) {
       logger.error("There was an error setting up the validator endpoint:", e);
       System.exit(1);
