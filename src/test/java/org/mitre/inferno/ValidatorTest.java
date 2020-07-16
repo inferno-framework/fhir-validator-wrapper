@@ -93,7 +93,8 @@ public class ValidatorTest {
   @Test
   void getKnownIGs() {
     List<String> knownIGs = validator.getKnownIGs();
-    assertTrue(knownIGs.contains("hl7.fhir.r4.core#4.0.1"));
+    assertTrue(knownIGs.contains("http://hl7.org/fhir/us/core"));
+    assertTrue(knownIGs.size() > 10);
   }
 
   boolean isProfileLoaded(String profile) {
