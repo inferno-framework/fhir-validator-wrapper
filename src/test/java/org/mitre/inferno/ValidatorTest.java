@@ -178,9 +178,23 @@ public class ValidatorTest {
 
   @Test
   void loadPackage() throws Exception {
-    assertFalse(isProfileLoaded("http://hl7.org.au/fhir/StructureDefinition/au-practitioner"));
-    validator.loadPackage(loadFile("hl7.fhir.au.base.tgz"));
-    assertTrue(isProfileLoaded("http://hl7.org.au/fhir/StructureDefinition/au-practitioner"));
+    final List<String> profilesToLoad = Arrays.asList(
+        "http://hl7.org.au/fhir/StructureDefinition/au-address",
+        "http://hl7.org.au/fhir/StructureDefinition/au-assigningauthority",
+        "http://hl7.org.au/fhir/StructureDefinition/au-healthcareservice",
+        "http://hl7.org.au/fhir/StructureDefinition/au-location",
+        "http://hl7.org.au/fhir/StructureDefinition/au-organization",
+        "http://hl7.org.au/fhir/StructureDefinition/au-practitioner",
+        "http://hl7.org.au/fhir/StructureDefinition/au-practitionerrole",
+        "http://hl7.org.au/fhir/StructureDefinition/au-receivingapplication",
+        "http://hl7.org.au/fhir/StructureDefinition/au-receivingfacility",
+        "http://hl7.org.au/fhir/StructureDefinition/encryption-certificate-pem-x509",
+        "http://hl7.org.au/fhir/StructureDefinition/no-fixed-address"
+    );
+    assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
+    List<String> profileUrls = validator.loadPackage(loadFile("hl7.fhir.au.base.tgz"));
+    profileUrls.containsAll(profilesToLoad);
+    assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
   boolean isProfileLoaded(String profile) {
