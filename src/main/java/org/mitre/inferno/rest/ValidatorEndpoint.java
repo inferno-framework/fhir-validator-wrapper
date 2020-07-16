@@ -76,11 +76,7 @@ public class ValidatorEndpoint {
 
     get("/igs", (req, res) -> validator.getKnownIGs(), TO_JSON);
 
-    post("/igs",
-        (req, res) -> {
-          validator.loadPackage(req.bodyAsBytes());
-          return "";
-        });
+    post("/igs", (req, res) -> validator.loadPackage(req.bodyAsBytes()), TO_JSON);
 
     put("/igs/:id", (req, res) -> validator.loadIg(req.params("id")), TO_JSON);
   }

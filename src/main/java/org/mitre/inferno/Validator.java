@@ -4,9 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.elementmodel.Manager;
@@ -155,12 +162,32 @@ public class Validator {
     return getProfileUrls(id);
   }
 
+  private JsonObject parsePackageJson(byte[] content) throws IOException {
+    try (InputStream in = new ByteArrayInputStream(content);
+         GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
+         TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
+      // Search each tar entry for package/package.json
+      TarArchiveEntry entry;
+      while ((entry = tarIn.getNextTarEntry()) != null) {
+        if (entry.isFile() && entry.getName().equals("package/package.json")) {
+          // Parse package.json
+          try (InputStreamReader reader = new InputStreamReader(tarIn);
+               BufferedReader br = new BufferedReader(reader)) {
+            return (JsonObject) JsonParser.parseReader(br);
+          }
+        }
+      }
+      throw new FileNotFoundException("Could not find package/package.json");
+    }
+  }
+
   /**
    * Load a Gzipped IG into the validator.
    *
    * @param content the Gzip-encoded contents of the IG package to be loaded
+   * @return a list of profile URLs in this IG
    */
-  public void loadPackage(byte[] content) throws Exception {
+  public List<String> loadPackage(byte[] content) throws Exception {
     File temp = File.createTempFile("package", ".tgz");
     temp.deleteOnExit();
     try {
@@ -169,6 +196,10 @@ public class Validator {
     } finally {
       temp.delete();
     }
+    // Return list of profiles for this IG
+    JsonObject packageJson = parsePackageJson(content);
+    String id = JSONUtil.str(packageJson, "name");
+    return getProfileUrls(id);
   }
 
   /**
