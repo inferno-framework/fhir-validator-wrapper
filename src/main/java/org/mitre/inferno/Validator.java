@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
@@ -151,6 +153,22 @@ public class Validator {
   public List<String> loadIg(String id) throws Exception {
     hl7Validator.loadIg(id, true);
     return getProfileUrls(id);
+  }
+
+  /**
+   * Load a Gzipped IG into the validator.
+   *
+   * @param content the Gzip-encoded contents of the IG package to be loaded
+   */
+  public void loadPackage(byte[] content) throws Exception {
+    File temp = File.createTempFile("package", ".tgz");
+    temp.deleteOnExit();
+    try {
+      FileUtils.writeByteArrayToFile(temp, content);
+      hl7Validator.loadIg(temp.getCanonicalPath(), true);
+    } finally {
+      temp.delete();
+    }
   }
 
   /**

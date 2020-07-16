@@ -48,7 +48,7 @@ public class ValidatorEndpoint {
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type");
+      res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Content-Encoding");
       res.type("application/json");
     });
 
@@ -75,6 +75,12 @@ public class ValidatorEndpoint {
     get("/profiles-by-ig", (req, res) -> validator.getProfilesByIg(), TO_JSON);
 
     get("/igs", (req, res) -> validator.getKnownIGs(), TO_JSON);
+
+    post("/igs",
+        (req, res) -> {
+          validator.loadPackage(req.bodyAsBytes());
+          return "";
+        });
 
     put("/igs/:id", (req, res) -> validator.loadIg(req.params("id")), TO_JSON);
   }
