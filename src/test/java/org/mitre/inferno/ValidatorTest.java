@@ -176,6 +176,13 @@ public class ValidatorTest {
     assertTrue(newProfilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
+  @Test
+  void loadPackage() throws Exception {
+    assertFalse(isProfileLoaded("http://hl7.org.au/fhir/StructureDefinition/au-practitioner"));
+    validator.loadPackage(loadFile("hl7.fhir.au.base.tgz"));
+    assertTrue(isProfileLoaded("http://hl7.org.au/fhir/StructureDefinition/au-practitioner"));
+  }
+
   boolean isProfileLoaded(String profile) {
     return validator
         .getStructures()
