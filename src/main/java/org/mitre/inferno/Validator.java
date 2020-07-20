@@ -37,6 +37,7 @@ import org.hl7.fhir.utilities.cache.NpmPackage;
 import org.hl7.fhir.utilities.cache.ToolsVersion;
 import org.hl7.fhir.utilities.json.JSONUtil;
 import org.hl7.fhir.validation.ValidationEngine;
+import org.hl7.fhir.validation.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
 
 public class Validator {
@@ -215,6 +216,10 @@ public class Validator {
             },
             (existing, replacement) -> existing
         ));
+  }
+
+  public String getVersion() {
+    return VersionUtil.getVersion();
   }
 
   /**
