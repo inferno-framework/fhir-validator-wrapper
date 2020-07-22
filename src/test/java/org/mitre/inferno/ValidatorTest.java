@@ -170,6 +170,7 @@ public class ValidatorTest {
         "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-recorded",
         "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-servicenotrequested"
     );
+    assertTrue(newProfilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
     // There are 15 added profiles and 2 removed profiles going from version 3.3.0 to 4.9.0
     profileUrls = validator.loadIg("hl7.fhir.us.qicore#4.9.0");
