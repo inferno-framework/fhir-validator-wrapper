@@ -105,10 +105,30 @@ public class ValidatorTest {
 
   @Test
   void loadIg() throws Exception {
-    assertFalse(isProfileLoaded("http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-patient"));
+    List<String> profilesToLoad = Arrays.asList(
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-medication",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-medicationadministration",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-medicationdispense",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-medicationnotdispensed",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-medicationnotrequested",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-medicationrequest",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-medicationstatement",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-mednotadministered",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-notDone",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-notDoneReason",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-nutritionorder",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-observation",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-observationnotdone",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-organization",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-patient",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-practitioner",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-practitionerrole",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-procedure"
+    );
+    assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
     List<String> profileUrls = validator.loadIg("hl7.fhir.us.qicore");
-    assertTrue(profileUrls.contains("http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-patient"));
-    assertTrue(isProfileLoaded("http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-patient"));
+    assertTrue(profileUrls.containsAll(profilesToLoad));
+    assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
   boolean isProfileLoaded(String profile) {
