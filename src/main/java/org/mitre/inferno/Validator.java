@@ -101,7 +101,13 @@ public class Validator {
   }
 
   private List<String> getProfileUrls(String id) throws IOException {
-    NpmPackage npm = packageManager.loadPackage(id, "current");
+    String version = "current";
+    if (id.contains("#")) {
+      int index = id.indexOf("#");
+      version = id.substring(index + 1);
+      id = id.substring(0, index);
+    }
+    NpmPackage npm = packageManager.loadPackage(id, version);
     InputStream in = npm.load(".index.json");
     JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
 
