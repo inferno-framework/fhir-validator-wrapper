@@ -101,7 +101,7 @@ public class Validator {
   }
 
   private List<String> getProfileUrls(String id) throws IOException {
-    String version = "current";
+    String version = null;
     if (id.contains("#")) {
       int index = id.indexOf("#");
       version = id.substring(index + 1);
