@@ -1,6 +1,9 @@
 package org.mitre.inferno;
 
-import org.mitre.inferno.rest.ValidatorEndpoint;
+import java.io.IOException;
+import org.hl7.fhir.r5.context.SimpleWorkerContext;
+import org.hl7.fhir.r5.utils.FHIRPathEngine;
+import org.mitre.inferno.rest.Endpoints;
 import org.mitre.inferno.utils.SparkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +44,17 @@ public class App {
     }
   }
 
+  private static FHIRPathEngine initializePathEngine() {
+    Logger logger = LoggerFactory.getLogger(App.class);
+    try {
+      return new FHIRPathEngine(new SimpleWorkerContext());
+    } catch (IOException e) {
+      logger.error("There was an error initializing the FHIRPath engine:", e);
+      System.exit(1);
+      return null; // unreachable
+    }
+  }
+
   /**
    * Starts the app.
    */
@@ -48,7 +62,11 @@ public class App {
     Logger logger = LoggerFactory.getLogger(App.class);
     logger.info("Starting Server...");
     SparkUtils.createServerWithRequestLog(logger);
-    ValidatorEndpoint.getInstance(initializeValidator(), getPortNumber());
+    Endpoints.getInstance(
+        initializeValidator(),
+        initializePathEngine(),
+        getPortNumber()
+    );
   }
 
   private static int getPortNumber() {

@@ -1,29 +1,23 @@
 package org.mitre.inferno.rest;
 
-import static spark.Spark.before;
+import static org.mitre.inferno.rest.Endpoints.TO_JSON;
 import static spark.Spark.get;
-import static spark.Spark.options;
-import static spark.Spark.port;
 import static spark.Spark.post;
 import static spark.Spark.put;
 
-import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.List;
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.mitre.inferno.Validator;
 import org.mitre.inferno.Version;
-import spark.ResponseTransformer;
 
 public class ValidatorEndpoint {
   private static ValidatorEndpoint validatorEndpoint = null;
   private final Validator validator;
-  private static final ResponseTransformer TO_JSON = new Gson()::toJson;
 
-  private ValidatorEndpoint(Validator validator, int portNum) {
+  private ValidatorEndpoint(Validator validator) {
     this.validator = validator;
-    port(portNum);
     createRoutes();
   }
 
@@ -31,33 +25,19 @@ public class ValidatorEndpoint {
    * Get the existing ValidatorEndpoint or create one if it does not already exist.
    *
    * @param validator the Validator that should be used for this endpoint
-   * @param portNum the port that the ValidatorEndpoint should listen on
    * @return the singleton ValidatorEndpoint
    */
-  public static ValidatorEndpoint getInstance(Validator validator, int portNum) {
+  public static ValidatorEndpoint getInstance(Validator validator) {
     if (validatorEndpoint == null) {
-      validatorEndpoint = new ValidatorEndpoint(validator, portNum);
+      validatorEndpoint = new ValidatorEndpoint(validator);
     }
     return validatorEndpoint;
   }
 
   /**
-   * Creates the API routes for receiving and processing HTTP requests from clients.
+   * Creates the API routes for receiving and processing requests for the validation service.
    */
   private void createRoutes() {
-    // This adds permissive CORS headers to all requests
-    before((req, res) -> {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-      res.header("Access-Control-Allow-Headers",
-          "Access-Control-Allow-Origin, Content-Type, Content-Encoding");
-      res.type("application/json");
-    });
-
-    // This responds to OPTIONS requests, used by browsers to "preflight" check CORS requests,
-    // with a 200 OK response with no content and the CORS headers above
-    options("*", (req, res) -> "");
-
     post("/validate",
         (req, res) -> {
           res.type("application/fhir+json");
