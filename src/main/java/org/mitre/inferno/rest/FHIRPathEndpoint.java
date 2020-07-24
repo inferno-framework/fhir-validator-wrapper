@@ -48,6 +48,17 @@ public class FHIRPathEndpoint {
 
   private String convertToString(Base item) {
     String type = item.fhirType();
+    if (item.isPrimitive()) {
+      String value = item.primitiveValue();
+      switch (type) {
+        case "boolean":
+        case "integer":
+        case "decimal":
+          return value;
+        default: // TODO: handle date, dateTime, etc. appropriately
+          return '"' + value.replace("\"", "\\\"") + '"';
+      }
+    }
     try {
       if (item.isResource()) {
         return new JsonParser().composeString((Resource) item);
