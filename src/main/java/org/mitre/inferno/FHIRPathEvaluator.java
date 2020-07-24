@@ -19,14 +19,13 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
 
   @Override
   public String evaluateToString(Base base, String path) {
-    List<Base> result = super.evaluate(base, path);
+    List<Base> result = this.evaluate(base, path);
     return '['
-        + result.stream().map(this::convertToString).collect(Collectors.joining(","))
+        + result.stream().map(this::baseToString).collect(Collectors.joining(","))
         + ']';
   }
 
-  @Override
-  public String convertToString(Base item) {
+  String baseToString(Base item) {
     String type = item.fhirType();
     if (item.isPrimitive()) {
       String value = item.primitiveValue();
