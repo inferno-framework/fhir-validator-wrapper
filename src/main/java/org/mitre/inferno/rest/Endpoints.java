@@ -31,7 +31,7 @@ public class Endpoints {
    *                  Passing null will skip setting up the /validator endpoint.
    * @param evaluator the FHIRPathEvaluator that should be used at the /fhirpath endpoint.
    *                  Passing null will skip setting up the /fhirpath endpoint.
-   * @param port the port to list for requests on
+   * @param port the port to listen for requests on
    * @return the singleton Endpoints
    */
   public static Endpoints getInstance(Validator validator, FHIRPathEvaluator evaluator, int port) {
