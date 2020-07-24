@@ -6,7 +6,7 @@ import static spark.Spark.path;
 import static spark.Spark.port;
 
 import com.google.gson.Gson;
-import org.hl7.fhir.r5.utils.FHIRPathEngine;
+import org.mitre.inferno.FHIRPathEvaluator;
 import org.mitre.inferno.Validator;
 import spark.ResponseTransformer;
 
@@ -15,12 +15,12 @@ public class Endpoints {
   private static Endpoints endpoints = null;
 
   private final Validator validator;
-  private final FHIRPathEngine pathEngine;
+  private final FHIRPathEvaluator pathEvaluator;
 
-  private Endpoints(Validator validator, FHIRPathEngine engine, int portNum) {
+  private Endpoints(Validator validator, FHIRPathEvaluator evaluator, int port) {
     this.validator = validator;
-    this.pathEngine = engine;
-    port(portNum);
+    this.pathEvaluator = evaluator;
+    port(port);
     createRoutes();
   }
 
@@ -29,13 +29,14 @@ public class Endpoints {
    *
    * @param validator the Validator that should be used at the /validator endpoint.
    *                  Passing null will skip setting up the /validator endpoint.
-   * @param engine the FHIRPathEngine that should be used at the /fhirpath endpoint.
-   *               Passing null will skip setting up the /fhirpath endpoint.
+   * @param evaluator the FHIRPathEvaluator that should be used at the /fhirpath endpoint.
+   *                  Passing null will skip setting up the /fhirpath endpoint.
+   * @param port the port to list for requests on
    * @return the singleton Endpoints
    */
-  public static Endpoints getInstance(Validator validator, FHIRPathEngine engine, int portNum) {
+  public static Endpoints getInstance(Validator validator, FHIRPathEvaluator evaluator, int port) {
     if (endpoints == null) {
-      endpoints = new Endpoints(validator, engine, portNum);
+      endpoints = new Endpoints(validator, evaluator, port);
     }
     return endpoints;
   }
@@ -59,8 +60,8 @@ public class Endpoints {
       path("/validator", () -> ValidatorEndpoint.getInstance(validator));
     }
 
-    if (pathEngine != null) {
-      path("/fhirpath", () -> FHIRPathEndpoint.getInstance(pathEngine));
+    if (pathEvaluator != null) {
+      path("/fhirpath", () -> FHIRPathEndpoint.getInstance(pathEvaluator));
     }
   }
 

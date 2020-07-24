@@ -1,8 +1,6 @@
 package org.mitre.inferno;
 
 import java.io.IOException;
-import org.hl7.fhir.r5.context.SimpleWorkerContext;
-import org.hl7.fhir.r5.utils.FHIRPathEngine;
 import org.mitre.inferno.rest.Endpoints;
 import org.mitre.inferno.utils.SparkUtils;
 import org.slf4j.Logger;
@@ -44,12 +42,12 @@ public class App {
     }
   }
 
-  private static FHIRPathEngine initializePathEngine() {
+  private static FHIRPathEvaluator initializePathEvaluator() {
     Logger logger = LoggerFactory.getLogger(App.class);
     try {
-      return new FHIRPathEngine(new SimpleWorkerContext());
+      return new FHIRPathEvaluator();
     } catch (IOException e) {
-      logger.error("There was an error initializing the FHIRPath engine:", e);
+      logger.error("There was an error initializing the FHIRPath evaluator:", e);
       System.exit(1);
       return null; // unreachable
     }
@@ -64,7 +62,7 @@ public class App {
     SparkUtils.createServerWithRequestLog(logger);
     Endpoints.getInstance(
         initializeValidator(),
-        initializePathEngine(),
+        initializePathEvaluator(),
         getPortNumber()
     );
   }
