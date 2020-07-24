@@ -101,12 +101,9 @@ public class Validator {
   }
 
   private List<String> getProfileUrls(String id) throws IOException {
-    String version = null;
-    if (id.contains("#")) {
-      int index = id.indexOf("#");
-      version = id.substring(index + 1);
-      id = id.substring(0, index);
-    }
+    String[] fragments = id.split("#");
+    id = fragments[0];
+    String version = fragments.length > 1 ? fragments[1] : null;
     NpmPackage npm = packageManager.loadPackage(id, version);
     InputStream in = npm.load(".index.json");
     JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
