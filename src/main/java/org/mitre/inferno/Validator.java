@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.hl7.fhir.r5.context.SimpleWorkerContext;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.model.FhirPublication;
@@ -58,32 +57,51 @@ public class Validator {
     packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
   }
 
+  /**
+   * Lists the names of resources defined for this version of the validator.
+   *
+   * @return a sorted list of distinct resource names
+   */
   public List<String> getResources() {
-    return hl7Validator.getContext().getResourceNames();
+    return hl7Validator.getContext().getResourceNames()
+        .stream()
+        .sorted()
+        .distinct()
+        .collect(Collectors.toList());
   }
 
   /**
    * Lists the StructureDefinitions loaded in the validator.
    *
-   * @return structures the list of structures
+   * @return a sorted list of distinct structure canonicals
    */
   public List<String> getStructures() {
     List<StructureDefinition> structures = hl7Validator.getContext().getStructures();
     return structures
         .stream()
         .map(StructureDefinition::getUrl)
+        .sorted()
+        .distinct()
         .collect(Collectors.toList());
   }
 
+  /**
+   * Validates the given resource against the given list of profiles.
+   *
+   * @param resource a byte array representation of a FHIR resource
+   * @param profiles a list of profile URLs to validate against
+   * @return an OperationOutcome resource representing the result of the validation operation
+   * @throws Exception if there was an error validating the resource
+   */
   public OperationOutcome validate(byte[] resource, List<String> profiles) throws Exception {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
     return hl7Validator.validate(null, resource, fmt, profiles);
   }
 
   /**
-   * Provides a list of known IGs that can be retrieved and loaded.
+   * Provides a map of known IGs that can be retrieved and loaded.
    *
-   * @return the list of IGs.
+   * @return a map containing each known IG ID and its corresponding canonical URL.
    */
   public Map<String, String> getKnownIGs() throws IOException {
     Map<String, String> igs = new HashMap<>();
@@ -93,11 +111,13 @@ public class Validator {
 
   /**
    * Load a profile into the validator.
+   *
    * @param profile the profile to be loaded
    */
-  public void loadProfile(Resource profile) {
-    SimpleWorkerContext context = hl7Validator.getContext();
-    context.cacheResource(profile);
+  public void loadProfile(byte[] profile) throws IOException {
+    Manager.FhirFormat fmt = FormatUtilities.determineFormat(profile);
+    Resource resource = FormatUtilities.makeParser(fmt).parse(profile);
+    hl7Validator.getContext().cacheResource(resource);
   }
 
   private List<String> getProfileUrls(String id) throws IOException {
@@ -143,7 +163,7 @@ public class Validator {
     return igs
         .stream()
         .collect(Collectors.toMap(
-            ig -> ig.getPackageId() + (ig.hasVersion() ? "#" + ig.getVersion() : ""),
+            ImplementationGuide::getPackageId,
             ig -> {
               try {
                 return getProfileUrls(ig.getPackageId());
@@ -162,9 +182,7 @@ public class Validator {
    * @throws IOException if the file fails to load
    */
   public void loadProfileFromFile(String src) throws IOException {
-    byte[] resource = loadResourceFromFile(src);
-    Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
-    Resource profile = FormatUtilities.makeParser(fmt).parse(resource);
+    byte[] profile = loadResourceFromFile(src);
     loadProfile(profile);
   }
 
