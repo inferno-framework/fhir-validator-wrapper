@@ -42,6 +42,7 @@ import org.mitre.inferno.rest.IgResponse;
 public class Validator {
   private final ValidationEngine hl7Validator;
   private final FilesystemPackageCacheManager packageManager;
+  private final Map<String, NpmPackage> loadedPackages;
 
   /**
    * Creates the HL7 Validator to which can then be used for validation.
@@ -65,6 +66,7 @@ public class Validator {
     hl7Validator.prepare();
 
     packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
+    loadedPackages = new HashMap<>();
   }
 
   /**
@@ -131,7 +133,14 @@ public class Validator {
   }
 
   private IgResponse getLoadedIg(String id, String version) throws IOException {
-    NpmPackage npm = packageManager.loadPackage(id, version);
+    NpmPackage npm = loadedPackages.get(id + "#" + version);
+    if (npm == null) {
+      npm = packageManager.loadPackage(id, version);
+    }
+    return getLoadedIg(npm);
+  }
+
+  private IgResponse getLoadedIg(NpmPackage npm) throws IOException {
     InputStream in = npm.load(".index.json");
     JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
 
@@ -161,25 +170,6 @@ public class Validator {
     return getLoadedIg(id, version);
   }
 
-  private JsonObject parsePackageJson(byte[] content) throws IOException {
-    try (InputStream in = new ByteArrayInputStream(content);
-         GzipCompressorInputStream gzipIn = new GzipCompressorInputStream(in);
-         TarArchiveInputStream tarIn = new TarArchiveInputStream(gzipIn)) {
-      // Search each tar entry for package/package.json
-      TarArchiveEntry entry;
-      while ((entry = tarIn.getNextTarEntry()) != null) {
-        if (entry.isFile() && entry.getName().equals("package/package.json")) {
-          // Parse package.json
-          try (InputStreamReader reader = new InputStreamReader(tarIn);
-               BufferedReader br = new BufferedReader(reader)) {
-            return (JsonObject) JsonParser.parseReader(br);
-          }
-        }
-      }
-      throw new FileNotFoundException("Could not find package/package.json");
-    }
-  }
-
   /**
    * Load a Gzipped IG into the validator.
    *
@@ -195,11 +185,9 @@ public class Validator {
     } finally {
       temp.delete();
     }
-    // Return list of profiles for this IG
-    JsonObject packageJson = parsePackageJson(content);
-    String id = JSONUtil.str(packageJson, "name");
-    String version = JSONUtil.str(packageJson, "version");
-    return getLoadedIg(id, version);
+    NpmPackage npm = NpmPackage.fromPackage(new ByteArrayInputStream(content));
+    loadedPackages.put(npm.id() + "#" + npm.version(), npm);
+    return getLoadedIg(npm);
   }
 
   /**
