@@ -130,10 +130,7 @@ public class Validator {
     hl7Validator.getContext().cacheResource(resource);
   }
 
-  private IgResponse getLoadedIg(String id) throws IOException {
-    String[] fragments = id.split("#");
-    id = fragments[0];
-    String version = fragments.length > 1 ? fragments[1] : null;
+  private IgResponse getLoadedIg(String id, String version) throws IOException {
     NpmPackage npm = packageManager.loadPackage(id, version);
     InputStream in = npm.load(".index.json");
     JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
@@ -156,11 +153,12 @@ public class Validator {
    * Load an IG into the validator.
    *
    * @param id the package ID of the FHIR IG to be loaded
+   * @param version the package version of the FHIR IG to be loaded
    * @return an IgResponse representing the package that was loaded
    */
-  public IgResponse loadIg(String id) throws Exception {
-    hl7Validator.loadIg(id, true);
-    return getLoadedIg(id);
+  public IgResponse loadIg(String id, String version) throws Exception {
+    hl7Validator.loadIg(id + (version != null ? "#" + version : ""), true);
+    return getLoadedIg(id, version);
   }
 
   private JsonObject parsePackageJson(byte[] content) throws IOException {
@@ -201,7 +199,7 @@ public class Validator {
     JsonObject packageJson = parsePackageJson(content);
     String id = JSONUtil.str(packageJson, "name");
     String version = JSONUtil.str(packageJson, "version");
-    return getLoadedIg(id + "#" + version);
+    return getLoadedIg(id, version);
   }
 
   /**
@@ -217,7 +215,7 @@ public class Validator {
             ImplementationGuide::getPackageId,
             ig -> {
               try {
-                return getLoadedIg(ig.getPackageId()).getProfiles();
+                return getLoadedIg(ig.getPackageId(), ig.getVersion()).getProfiles();
               } catch (IOException e) {
                 return new ArrayList<>();
               }

@@ -116,7 +116,7 @@ public class ValidatorTest {
     assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
     // Because the version isn't given, this should load the "current" version of hl7.fhir.us.mcode
-    IgResponse ig = validator.loadIg("hl7.fhir.us.mcode");
+    IgResponse ig = validator.loadIg("hl7.fhir.us.mcode", null);
     assertEquals("hl7.fhir.us.mcode", ig.id);
     assertTrue(ig.profiles.containsAll(profilesToLoad));
     assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
@@ -142,7 +142,7 @@ public class ValidatorTest {
     );
     assertTrue(oldProfilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
-    IgResponse ig = validator.loadIg("hl7.fhir.us.qicore#3.3.0");
+    IgResponse ig = validator.loadIg("hl7.fhir.us.qicore", "3.3.0");
     assertEquals("hl7.fhir.us.qicore", ig.id);
     assertEquals("3.3.0", ig.version);
     assertEquals(45, ig.profiles.size());
@@ -172,7 +172,7 @@ public class ValidatorTest {
     assertTrue(newProfilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
     // There are 15 added profiles and 2 removed profiles going from version 3.3.0 to 4.9.0
-    ig = validator.loadIg("hl7.fhir.us.qicore#4.9.0");
+    ig = validator.loadIg("hl7.fhir.us.qicore", "4.9.0");
     assertEquals("hl7.fhir.us.qicore", ig.id);
     assertEquals("4.9.0", ig.version);
     assertEquals(58, ig.profiles.size());
