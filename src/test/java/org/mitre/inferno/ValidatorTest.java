@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mitre.inferno.rest.IgResponse;
 
 
 public class ValidatorTest {
@@ -115,8 +116,9 @@ public class ValidatorTest {
     assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
     // Because the version isn't given, this should load the "current" version of hl7.fhir.us.mcode
-    List<String> profileUrls = validator.loadIg("hl7.fhir.us.mcode");
-    assertTrue(profileUrls.containsAll(profilesToLoad));
+    IgResponse ig = validator.loadIg("hl7.fhir.us.mcode");
+    assertEquals("hl7.fhir.us.mcode", ig.id);
+    assertTrue(ig.profiles.containsAll(profilesToLoad));
     assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
@@ -140,11 +142,13 @@ public class ValidatorTest {
     );
     assertTrue(oldProfilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
-    List<String> profileUrls = validator.loadIg("hl7.fhir.us.qicore#3.3.0");
-    assertEquals(45, profileUrls.size());
+    IgResponse ig = validator.loadIg("hl7.fhir.us.qicore#3.3.0");
+    assertEquals("hl7.fhir.us.qicore", ig.id);
+    assertEquals("3.3.0", ig.version);
+    assertEquals(45, ig.profiles.size());
 
     // All old profiles to load have been loaded and are returned in the resulting list
-    assertTrue(profileUrls.containsAll(oldProfilesToLoad));
+    assertTrue(ig.profiles.containsAll(oldProfilesToLoad));
     assertTrue(oldProfilesToLoad.stream().allMatch(this::isProfileLoaded));
 
     // All of the profiles that are in hl7.fhir.us.qicore#4.9.0, but not hl7.fhir.us.qicore#3.3.0
@@ -168,11 +172,13 @@ public class ValidatorTest {
     assertTrue(newProfilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
     // There are 15 added profiles and 2 removed profiles going from version 3.3.0 to 4.9.0
-    profileUrls = validator.loadIg("hl7.fhir.us.qicore#4.9.0");
-    assertEquals(58, profileUrls.size());
+    ig = validator.loadIg("hl7.fhir.us.qicore#4.9.0");
+    assertEquals("hl7.fhir.us.qicore", ig.id);
+    assertEquals("4.9.0", ig.version);
+    assertEquals(58, ig.profiles.size());
 
     // All new profiles to load have been loaded and are returned in the resulting list
-    assertTrue(profileUrls.containsAll(newProfilesToLoad));
+    assertTrue(ig.profiles.containsAll(newProfilesToLoad));
     assertTrue(newProfilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
@@ -192,8 +198,9 @@ public class ValidatorTest {
         "http://hl7.org.au/fhir/StructureDefinition/no-fixed-address"
     );
     assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
-    List<String> profileUrls = validator.loadPackage(loadFile("hl7.fhir.au.base.tgz"));
-    profileUrls.containsAll(profilesToLoad);
+    IgResponse ig = validator.loadPackage(loadFile("hl7.fhir.au.base.tgz"));
+    assertEquals("hl7.fhir.au.base", ig.id);
+    ig.profiles.containsAll(profilesToLoad);
     assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
