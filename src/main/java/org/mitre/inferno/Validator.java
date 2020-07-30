@@ -37,6 +37,7 @@ import org.hl7.fhir.utilities.cache.NpmPackage;
 import org.hl7.fhir.utilities.cache.ToolsVersion;
 import org.hl7.fhir.utilities.json.JSONUtil;
 import org.hl7.fhir.validation.ValidationEngine;
+import org.mitre.inferno.rest.IgResponse;
 
 public class Validator {
   private final ValidationEngine hl7Validator;
@@ -129,7 +130,7 @@ public class Validator {
     hl7Validator.getContext().cacheResource(resource);
   }
 
-  private List<String> getProfileUrls(String id) throws IOException {
+  private IgResponse getLoadedIg(String id) throws IOException {
     String[] fragments = id.split("#");
     id = fragments[0];
     String version = fragments.length > 1 ? fragments[1] : null;
@@ -148,18 +149,18 @@ public class Validator {
       }
     }
     Collections.sort(profileUrls);
-    return profileUrls;
+    return new IgResponse(npm.id(), npm.version(), profileUrls);
   }
 
   /**
    * Load an IG into the validator.
    *
    * @param id the package ID of the FHIR IG to be loaded
-   * @return a list of profile URLs for the loaded IG
+   * @return an IgResponse representing the package that was loaded
    */
-  public List<String> loadIg(String id) throws Exception {
+  public IgResponse loadIg(String id) throws Exception {
     hl7Validator.loadIg(id, true);
-    return getProfileUrls(id);
+    return getLoadedIg(id);
   }
 
   private JsonObject parsePackageJson(byte[] content) throws IOException {
@@ -185,9 +186,9 @@ public class Validator {
    * Load a Gzipped IG into the validator.
    *
    * @param content the Gzip-encoded contents of the IG package to be loaded
-   * @return a list of profile URLs in this IG
+   * @return an IgResponse representing the package that was loaded
    */
-  public List<String> loadPackage(byte[] content) throws Exception {
+  public IgResponse loadPackage(byte[] content) throws Exception {
     File temp = File.createTempFile("package", ".tgz");
     temp.deleteOnExit();
     try {
@@ -199,7 +200,8 @@ public class Validator {
     // Return list of profiles for this IG
     JsonObject packageJson = parsePackageJson(content);
     String id = JSONUtil.str(packageJson, "name");
-    return getProfileUrls(id);
+    String version = JSONUtil.str(packageJson, "version");
+    return getLoadedIg(id + "#" + version);
   }
 
   /**
@@ -215,7 +217,7 @@ public class Validator {
             ImplementationGuide::getPackageId,
             ig -> {
               try {
-                return getProfileUrls(ig.getPackageId());
+                return getLoadedIg(ig.getPackageId()).getProfiles();
               } catch (IOException e) {
                 return new ArrayList<>();
               }
