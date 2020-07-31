@@ -117,6 +117,11 @@ public class Validator {
    */
   public Map<String, String> getKnownIGs() throws IOException {
     Map<String, String> igs = new HashMap<>();
+    // Add known custom IGs
+    for (Map.Entry<String, NpmPackage> e : loadedPackages.entrySet()) {
+      igs.put(e.getKey(), e.getValue().canonical());
+    }
+    // Add IGs known to the package manager, replacing any conflicting package IDs
     packageManager.listAllIds(igs);
     return igs;
   }
