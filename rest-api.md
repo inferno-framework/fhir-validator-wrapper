@@ -26,7 +26,7 @@ a JSON array of [profile URLs](http://www.hl7.org/fhir/structuredefinition-defin
 - **Route:**
 `POST /validator/profiles`
 - **Body:**
-the JSON or XML FHIR resource you want to validate
+the JSON or XML [profile](http://www.hl7.org/fhir/structuredefinition.html) you want to load into the validator
 - **Response:**
 None
 
