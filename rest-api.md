@@ -1,6 +1,6 @@
-### Validator Routes
+# Validator Routes
 
-#### Validate a resource
+### Validate a resource
 - **Route:**
 `POST /validator/validate`
 - **Query Params:**
@@ -10,19 +10,19 @@ the JSON or XML FHIR resource to validate
 - **Response:**
 a JSON [OperationOutcome](https://www.hl7.org/fhir/operationoutcome.html)
 
-#### List supported resources
+### List supported resources
 - **Route:**
 `GET /validator/resources`
 - **Response:**
 a JSON array of FHIR resource types known to the validator
 
-#### List supported profiles
+### List supported profiles
 - **Route:**
 `GET /validator/profiles`
 - **Response:**
 a JSON array of [profile URLs](http://www.hl7.org/fhir/structuredefinition-definitions.html#StructureDefinition.url) known to the validator
 
-#### Load a custom profile
+### Load a custom profile
 - **Route:**
 `POST /validator/profiles`
 - **Body:**
@@ -30,19 +30,19 @@ the JSON or XML FHIR resource you want to validate
 - **Response:**
 None
 
-#### List profiles by implementation guide (IG)
+### List profiles by implementation guide (IG)
 - **Route:**
 `GET /validator/profiles-by-ig`
 - **Response:**
 a JSON object containing an array of profile URLs for each IG loaded into the validator
 
-#### List known IGs
+### List known IGs
 - **Route:**
 `GET /validator/igs`
 - **Response:**
 a JSON object containing the canonical URL for each IG loaded into the validator
 
-#### Load an IG by NPM package ID
+### Load an IG by NPM package ID
 - **Route:**
 `PUT /validator/igs/[NPM package ID]`
 - **Query Params:**
@@ -50,7 +50,7 @@ a JSON object containing the canonical URL for each IG loaded into the validator
 - **Response:**
 the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#loading-an-ig-by-id-and-version) for an example.
 
-#### Load a custom IG
+### Load a custom IG
 - **Route:**
 `POST /validator/igs`
 - **Body:**
@@ -59,9 +59,9 @@ Note that the request must have the `Content-Encoding: gzip` header.
 - **Response:**
 the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#loading-a-custom-ig) for an example.
 
-### FHIRPath Routes
+# FHIRPath Routes
 
-#### Evaluate a FHIRPath expression
+### Evaluate a FHIRPath expression
 - **Route:**
 `POST /fhirpath/evaluate`
 - **Query Params:**
@@ -71,9 +71,9 @@ the JSON or XML FHIR resource to serve as the root resource when evaluating the 
 - **Response:**
 a JSON array representing the result of evaluating the given expression against the given root resource
 
-### Example Requests and Responses
+# Example Requests and Responses
 
-#### Loading an IG by ID and version
+### Loading an IG by ID and version
 This request assumes that the service is listening on port 4567.
 
 - **Example Request:**
@@ -91,7 +91,7 @@ This request assumes that the service is listening on port 4567.
 }
 ```
 
-#### Loading a custom IG
+### Loading a custom IG
 This request assumes that the service is listening on port 4567 and that the `package.tgz` to upload is
 in the current working directory.
 
