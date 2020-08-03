@@ -77,7 +77,7 @@ a JSON array representing the result of evaluating the given expression against 
 This request assumes that the service is listening on port 4567.
 
 - **Example Request:**
-`curl -s -X PUT 'http://localhost:4567/igs/hl7.fhir.us.qicore?version=4.9.0'`
+`curl -s -X PUT 'http://localhost:4567/validator/igs/hl7.fhir.us.qicore?version=4.9.0'`
 - **Example Response:**
 ```
 {
@@ -96,7 +96,7 @@ This request assumes that the service is listening on port 4567 and that the `pa
 in the current working directory.
 
 - **Example Request:**
-`curl -s -X POST -H 'Content-Encoding: gzip' --data-binary '@package.tgz' 'http://localhost:4567/igs'`
+`curl -s -X POST -H 'Content-Encoding: gzip' --data-binary '@package.tgz' 'http://localhost:4567/validator/igs'`
 - **Example Response:**
 ```
 {
