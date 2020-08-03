@@ -48,7 +48,7 @@ a JSON object containing the canonical URL for each IG loaded into the validator
 - **Query Params:**
 `version=[NPM package version]` (Optional)
 - **Response:**
-the NPM ID, version, and list of profile URLs of the loaded IG
+the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#loading-an-ig-by-id-and-version) for an example.
 
 #### Load a custom IG
 - **Route:**
@@ -57,7 +57,7 @@ the NPM ID, version, and list of profile URLs of the loaded IG
 the raw contents of the `package.tgz` containing the IG to be loaded into the validator.
 Note that the request must have the `Content-Encoding: gzip` header.
 - **Response:**
-the NPM ID, version, and list of profile URLs of the loaded IG
+the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#loading-a-custom-ig) for an example.
 
 ### FHIRPath Routes
 
@@ -70,3 +70,41 @@ the NPM ID, version, and list of profile URLs of the loaded IG
 the JSON or XML FHIR resource to serve as the root resource when evaluating the expression
 - **Response:**
 a JSON array representing the result of evaluating the given expression against the given root resource
+
+### Example Requests and Responses
+
+#### Loading an IG by ID and version
+This request assumes that the service is listening on port 4567.
+
+- **Example Request:**
+`curl -s -X PUT 'http://localhost:4567/igs/hl7.fhir.us.qicore?version=4.9.0'`
+- **Example Response:**
+```
+{
+    "id": "hl7.fhir.us.qicore",
+    "version": "4.9.0",
+    "profiles": [
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-adverseevent",
+        "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-allergyintolerance",
+        ...
+    ]
+}
+```
+
+#### Loading a custom IG
+This request assumes that the service is listening on port 4567 and that the `package.tgz` to upload is
+in the current working directory.
+
+- **Example Request:**
+`curl -s -X POST -H 'Content-Encoding: gzip' --data-binary '@package.tgz' 'http://localhost:4567/igs'`
+- **Example Response:**
+```
+{
+    "id": "example.fhir.core",
+    "version": "1.0.0",
+    "profiles": [
+        "http://example.org/fhir/example/StructureDefinition/example-condition",
+        "http://example.org/fhir/example/StructureDefinition/example-patient"
+    ]
+}
+```
