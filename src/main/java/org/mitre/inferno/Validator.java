@@ -4,8 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
@@ -28,10 +37,12 @@ import org.hl7.fhir.utilities.cache.NpmPackage;
 import org.hl7.fhir.utilities.cache.ToolsVersion;
 import org.hl7.fhir.utilities.json.JSONUtil;
 import org.hl7.fhir.validation.ValidationEngine;
+import org.mitre.inferno.rest.IgResponse;
 
 public class Validator {
   private final ValidationEngine hl7Validator;
   private final FilesystemPackageCacheManager packageManager;
+  private final Map<String, NpmPackage> loadedPackages;
 
   /**
    * Creates the HL7 Validator to which can then be used for validation.
@@ -55,6 +66,7 @@ public class Validator {
     hl7Validator.prepare();
 
     packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
+    loadedPackages = new HashMap<>();
   }
 
   /**
@@ -105,6 +117,11 @@ public class Validator {
    */
   public Map<String, String> getKnownIGs() throws IOException {
     Map<String, String> igs = new HashMap<>();
+    // Add known custom IGs
+    for (Map.Entry<String, NpmPackage> e : loadedPackages.entrySet()) {
+      igs.put(e.getKey(), e.getValue().canonical());
+    }
+    // Add IGs known to the package manager, replacing any conflicting package IDs
     packageManager.listAllIds(igs);
     return igs;
   }
@@ -120,11 +137,15 @@ public class Validator {
     hl7Validator.getContext().cacheResource(resource);
   }
 
-  private List<String> getProfileUrls(String id) throws IOException {
-    String[] fragments = id.split("#");
-    id = fragments[0];
-    String version = fragments.length > 1 ? fragments[1] : null;
-    NpmPackage npm = packageManager.loadPackage(id, version);
+  private IgResponse getLoadedIg(String id, String version) throws IOException {
+    NpmPackage npm = loadedPackages.get(id + "#" + version);
+    if (npm == null) {
+      npm = packageManager.loadPackage(id, version);
+    }
+    return getLoadedIg(npm);
+  }
+
+  private IgResponse getLoadedIg(NpmPackage npm) throws IOException {
     InputStream in = npm.load(".index.json");
     JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
 
@@ -139,18 +160,39 @@ public class Validator {
       }
     }
     Collections.sort(profileUrls);
-    return profileUrls;
+    return new IgResponse(npm.id(), npm.version(), profileUrls);
   }
 
   /**
    * Load an IG into the validator.
    *
    * @param id the package ID of the FHIR IG to be loaded
-   * @return a list of profile URLs for the loaded IG
+   * @param version the package version of the FHIR IG to be loaded
+   * @return an IgResponse representing the package that was loaded
    */
-  public List<String> loadIg(String id) throws Exception {
-    hl7Validator.loadIg(id, true);
-    return getProfileUrls(id);
+  public IgResponse loadIg(String id, String version) throws Exception {
+    hl7Validator.loadIg(id + (version != null ? "#" + version : ""), true);
+    return getLoadedIg(id, version);
+  }
+
+  /**
+   * Load a Gzipped IG into the validator.
+   *
+   * @param content the Gzip-encoded contents of the IG package to be loaded
+   * @return an IgResponse representing the package that was loaded
+   */
+  public IgResponse loadPackage(byte[] content) throws Exception {
+    File temp = File.createTempFile("package", ".tgz");
+    temp.deleteOnExit();
+    try {
+      FileUtils.writeByteArrayToFile(temp, content);
+      hl7Validator.loadIg(temp.getCanonicalPath(), true);
+    } finally {
+      temp.delete();
+    }
+    NpmPackage npm = NpmPackage.fromPackage(new ByteArrayInputStream(content));
+    loadedPackages.put(npm.id() + "#" + npm.version(), npm);
+    return getLoadedIg(npm);
   }
 
   /**
@@ -166,7 +208,7 @@ public class Validator {
             ImplementationGuide::getPackageId,
             ig -> {
               try {
-                return getProfileUrls(ig.getPackageId());
+                return getLoadedIg(ig.getPackageId(), ig.getVersion()).getProfiles();
               } catch (IOException e) {
                 return new ArrayList<>();
               }
