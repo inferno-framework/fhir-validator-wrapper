@@ -48,7 +48,8 @@ public class ValidatorEndpoint {
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type, Content-Encoding");
+      res.header("Access-Control-Allow-Headers",
+          "Access-Control-Allow-Origin, Content-Type, Content-Encoding");
       res.type("application/json");
     });
 
