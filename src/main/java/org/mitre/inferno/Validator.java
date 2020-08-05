@@ -114,7 +114,9 @@ public class Validator {
     Map<String, String> igs = new HashMap<>();
     // Add known custom IGs
     for (Map.Entry<String, NpmPackage> e : loadedPackages.entrySet()) {
-      igs.put(e.getKey(), e.getValue().canonical());
+      String id = e.getKey().split("#")[0];
+      String canonical = e.getValue().canonical();
+      igs.put(id, canonical);
     }
     // Add IGs known to the package manager, replacing any conflicting package IDs
     packageManager.listAllIds(igs);
