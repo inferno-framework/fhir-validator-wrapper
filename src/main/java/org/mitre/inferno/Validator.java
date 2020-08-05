@@ -1,16 +1,10 @@
 package org.mitre.inferno;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +18,10 @@ import org.hl7.fhir.r5.model.ImplementationGuide;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
-import org.hl7.fhir.utilities.TextFile;
 import org.hl7.fhir.utilities.VersionUtilities;
 import org.hl7.fhir.utilities.cache.FilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.cache.NpmPackage;
 import org.hl7.fhir.utilities.cache.ToolsVersion;
-import org.hl7.fhir.utilities.json.JSONUtil;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
@@ -157,25 +149,7 @@ public class Validator {
     if (npm == null) {
       npm = packageManager.loadPackage(id, version);
     }
-    return packageToIgResponse(npm);
-  }
-
-  private IgResponse packageToIgResponse(NpmPackage npm) throws IOException {
-    InputStream in = npm.load(".index.json");
-    JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
-
-    JsonArray files = index.getAsJsonArray("files");
-    List<String> profileUrls = new ArrayList<>();
-    for (JsonElement f : files) {
-      JsonObject file = (JsonObject) f;
-      String type = JSONUtil.str(file, "resourceType");
-      String url = JSONUtil.str(file, "url");
-      if (type.equals("StructureDefinition")) {
-        profileUrls.add(url);
-      }
-    }
-    Collections.sort(profileUrls);
-    return new IgResponse(npm.id(), npm.version(), profileUrls);
+    return IgResponse.fromPackage(npm);
   }
 
   /**
@@ -192,7 +166,7 @@ public class Validator {
       hl7Validator.loadIg(id + (version != null ? "#" + version : ""), true);
       npm = packageManager.loadPackage(id, version);
     }
-    return packageToIgResponse(npm);
+    return IgResponse.fromPackage(npm);
   }
 
   /**
@@ -212,7 +186,7 @@ public class Validator {
     }
     NpmPackage npm = NpmPackage.fromPackage(new ByteArrayInputStream(content));
     loadedPackages.put(npm.id() + "#" + npm.version(), npm);
-    return packageToIgResponse(npm);
+    return IgResponse.fromPackage(npm);
   }
 
   /**
