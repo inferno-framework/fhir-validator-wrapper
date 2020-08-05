@@ -134,15 +134,33 @@ public class Validator {
     hl7Validator.getContext().cacheResource(resource);
   }
 
-  private IgResponse getLoadedIg(String id, String version) throws IOException {
-    NpmPackage npm = loadedPackages.get(id + "#" + version);
+  /**
+   * Finds any custom package that fits the given id and (possibly null) version.
+   *
+   * @param id the ID of the custom package
+   * @param version the version of the custom package, or null to return the first match
+   * @return a matching custom IG package, or null if no matching package was found
+   */
+  private NpmPackage findCustomPackage(String id, String version) {
+    String idRegex = "^" + id + "#" + (version != null ? version : ".*") + "$";
+    for (Map.Entry<String, NpmPackage> entry : loadedPackages.entrySet()) {
+      if (entry.getKey().matches(idRegex)) {
+        return entry.getValue();
+      }
+    }
+    return null;
+  }
+
+  private IgResponse getIg(String id, String version) throws IOException {
+    NpmPackage npm = findCustomPackage(id, version);
+    // Fallback to packages from packages.fhir.org if no custom packages match
     if (npm == null) {
       npm = packageManager.loadPackage(id, version);
     }
-    return getLoadedIg(npm);
+    return packageToIgResponse(npm);
   }
 
-  private IgResponse getLoadedIg(NpmPackage npm) throws IOException {
+  private IgResponse packageToIgResponse(NpmPackage npm) throws IOException {
     InputStream in = npm.load(".index.json");
     JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
 
@@ -168,8 +186,13 @@ public class Validator {
    * @return an IgResponse representing the package that was loaded
    */
   public IgResponse loadIg(String id, String version) throws Exception {
-    hl7Validator.loadIg(id + (version != null ? "#" + version : ""), true);
-    return getLoadedIg(id, version);
+    NpmPackage npm = findCustomPackage(id, version);
+    // Fallback to packages from packages.fhir.org if no custom packages match
+    if (npm == null) {
+      hl7Validator.loadIg(id + (version != null ? "#" + version : ""), true);
+      npm = packageManager.loadPackage(id, version);
+    }
+    return packageToIgResponse(npm);
   }
 
   /**
@@ -189,7 +212,7 @@ public class Validator {
     }
     NpmPackage npm = NpmPackage.fromPackage(new ByteArrayInputStream(content));
     loadedPackages.put(npm.id() + "#" + npm.version(), npm);
-    return getLoadedIg(npm);
+    return packageToIgResponse(npm);
   }
 
   /**
@@ -205,7 +228,7 @@ public class Validator {
             ImplementationGuide::getPackageId,
             ig -> {
               try {
-                return getLoadedIg(ig.getPackageId(), ig.getVersion()).getProfiles();
+                return getIg(ig.getPackageId(), ig.getVersion()).getProfiles();
               } catch (IOException e) {
                 return new ArrayList<>();
               }
