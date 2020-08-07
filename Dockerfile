@@ -6,6 +6,7 @@ COPY gradlew .
 RUN ./gradlew --version
 
 COPY settings.gradle .
+COPY gradle.properties .
 COPY build.gradle.kts .
 COPY config config
 COPY igs igs
