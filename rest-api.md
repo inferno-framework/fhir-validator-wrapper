@@ -54,8 +54,10 @@ the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#load
 - **Route:**
 `POST /igs`
 - **Body:**
-the raw contents of the `package.tgz` containing the IG to be loaded into the validator.
-Note that the request must have the `Content-Encoding: gzip` header.
+the raw contents of the `package.tgz` tarball containing the IG to be loaded into the validator.  
+**The `package.tgz` contents must conform to the [NPM Package Specification](https://confluence.hl7.org/display/FHIR/NPM+Package+Specification)
+and must include the .index.json file.**  
+Also note that the request must have the `Content-Encoding: gzip` header.
 - **Response:**
 the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#loading-a-custom-ig) for an example.
 
