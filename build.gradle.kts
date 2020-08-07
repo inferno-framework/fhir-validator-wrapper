@@ -84,4 +84,5 @@ tasks {
 
 val setVersion = tasks.processResources {
     expand("version" to project.version)
+    inputs.property("appVersion", project.version)
 }
