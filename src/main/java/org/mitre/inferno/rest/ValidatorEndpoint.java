@@ -13,6 +13,7 @@ import java.util.List;
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.mitre.inferno.Validator;
+import org.mitre.inferno.Version;
 import spark.ResponseTransformer;
 
 public class ValidatorEndpoint {
@@ -83,7 +84,7 @@ public class ValidatorEndpoint {
         (req, res) -> validator.loadIg(req.params("id"), req.queryParams("version")),
         TO_JSON);
 
-    get("/version", (req, res) -> validator.getVersion());
+    get("/version", (req, res) -> Version.getVersion());
   }
 
   /**

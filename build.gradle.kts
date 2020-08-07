@@ -6,7 +6,6 @@ plugins {
 }
 
 group = "org.mitre"
-version = "0.0.1"
 
 repositories {
     mavenCentral()
@@ -69,8 +68,8 @@ val testCoverage by tasks.registering {
 val fatJar = task("fatJar", type = Jar::class) {
     baseName = "${project.name}-fat"
     manifest {
-        attributes["Implementation-Title"] = "JNferno"
-        attributes["Implementation-Version"] = archiveVersion
+        attributes["Implementation-Title"] = "FHIR Validator Wrapper"
+        attributes["Implementation-Version"] = project.version
         attributes["Main-Class"] = "org.mitre.inferno.rest.Validate"
     }
     from(configurations.runtimeClasspath.get().map({ if (it.isDirectory) it else zipTree(it) }))
@@ -81,4 +80,8 @@ tasks {
     "build" {
         dependsOn(fatJar)
     }
+}
+
+val setVersion = tasks.processResources {
+    expand("version" to project.version)
 }
