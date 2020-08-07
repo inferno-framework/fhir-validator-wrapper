@@ -6,6 +6,10 @@ The `fhir-validator-wrapper` provides a persistent service for executing the
 [FHIR® Validator](https://wiki.hl7.org/Using_the_FHIR_Validator). It is intended to provide validation capabilities
 to other applications that integrate it.
 
+## REST API
+
+**[See here](rest-api.md) for the REST API documentation.**
+
 ## Installation
 
 **System Requirements:** The Validation Service requires Java 1.8 or above.
@@ -55,6 +59,7 @@ Run without terminology validation:
 ```shell script
 docker run -p 4567:4567 --env DISABLE_TX=true hl7_validator
 ```
+
 ## Contact Us
 The Inferno development team can be reached by email at inferno@groups.mitre.org.  Inferno also has a dedicated [HL7 FHIR chat channel](https://chat.fhir.org/#narrow/stream/153-inferno).
 
