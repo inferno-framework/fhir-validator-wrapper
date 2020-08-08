@@ -1,5 +1,9 @@
 language: java
 
+jdk:
+  - openjdk8
+  - openjdk14
+
 jobs:
   include:
     - name: "Build and Test"
