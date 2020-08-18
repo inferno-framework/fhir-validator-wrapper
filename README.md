@@ -8,7 +8,8 @@ to other applications that integrate it.
 
 ## REST API
 
-**[See here](rest-api.md) for the REST API documentation.**
+The FHIR Validation Service exposes two base paths: `/validator`, which prefixes all routes that talk to the HL7 Validator, and
+`/fhirpath`, which prefixes routes that evaluate FHIRPath expressions. **[See here](rest-api.md) for the REST API documentation.**
 
 ## Installation
 
