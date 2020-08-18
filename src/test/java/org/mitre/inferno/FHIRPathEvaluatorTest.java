@@ -27,7 +27,10 @@ class FHIRPathEvaluatorTest {
     Resource patient = loadResource("patient_fixture.json");
     assertEquals("[]", pathEvaluator.evaluateToString(patient, "Patient.foo"));
     assertEquals("[\"234\"]", pathEvaluator.evaluateToString(patient, "Patient.id.substring(1,3)"));
-    assertEquals("[\"A\",\"B\",\"C\"]", pathEvaluator.evaluateToString(patient, "Patient.name.given"));
+    assertEquals(
+        "[\"A\",\"B\",\"C\"]",
+        pathEvaluator.evaluateToString(patient, "Patient.name.given")
+    );
     assertEquals(
         "["
             + "{\"given\":[\"A\"]},"
