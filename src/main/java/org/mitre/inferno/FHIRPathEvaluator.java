@@ -21,8 +21,12 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
   public String evaluateToString(Base base, String path) {
     List<Base> result = this.evaluate(base, path);
     return '['
-        + result.stream().map(this::baseToString).collect(Collectors.joining(","))
+        + result.stream().map(this::baseToJson).collect(Collectors.joining(","))
         + ']';
+  }
+
+  private String baseToJson(Base item) {
+    return String.format("{\"type\":\"%s\",\"value\":%s}", item.fhirType(), baseToString(item));
   }
 
   String baseToString(Base item) {
