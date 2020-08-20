@@ -39,7 +39,10 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
         case "decimal":
           return value;
         default: // TODO: handle date, dateTime, etc. appropriately
-          return '"' + value.replace("\"", "\\\"") + '"';
+          return '"'
+              + value.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+              + '"';
       }
     }
     try {
