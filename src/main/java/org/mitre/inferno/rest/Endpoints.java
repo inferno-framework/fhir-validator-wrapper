@@ -2,7 +2,6 @@ package org.mitre.inferno.rest;
 
 import static spark.Spark.before;
 import static spark.Spark.options;
-import static spark.Spark.path;
 import static spark.Spark.port;
 
 import com.google.gson.Gson;
@@ -57,11 +56,11 @@ public class Endpoints {
     options("*", (req, res) -> "");
 
     if (validator != null) {
-      path("/validator", () -> ValidatorEndpoint.getInstance(validator));
+      ValidatorEndpoint.getInstance(validator);
     }
 
     if (pathEvaluator != null) {
-      path("/fhirpath", () -> FHIRPathEndpoint.getInstance(pathEvaluator));
+      FHIRPathEndpoint.getInstance(pathEvaluator);
     }
   }
 
