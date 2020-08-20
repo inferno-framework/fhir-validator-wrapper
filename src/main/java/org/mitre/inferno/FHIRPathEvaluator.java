@@ -38,9 +38,28 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
         case "boolean":
         case "integer":
         case "decimal":
+        case "unsignedInt":
+        case "positiveInt":
+          // convert to JSON boolean/number
           return value;
-        default: // TODO: handle date, dateTime, etc. appropriately
+        case "string":
+        case "uri":
+        case "url":
+        case "canonical":
+        case "base64Binary":
+        case "instant":
+        case "date":
+        case "dateTime":
+        case "time":
+        case "code":
+        case "oid":
+        case "id":
+        case "markdown":
+        case "uuid":
+          // convert to JSON string
           return new Gson().toJson(value);
+        default:
+          throw new IllegalArgumentException("Unexpected primitive type '" + type + "'.");
       }
     }
     try {
@@ -50,8 +69,8 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
         return new JsonParser().composeString((DataType) item, type);
       }
     } catch (IOException e) {
-      throw new FHIRException(String.format("Failed to compose item of type [%s].", type), e);
+      throw new FHIRException("Failed to compose item of type '" + type + "'.", e);
     }
-    throw new IllegalArgumentException(String.format("[%s] was not a Resource or DataType.", type));
+    throw new IllegalArgumentException("Type '" + type + "' was not a Resource or DataType.");
   }
 }
