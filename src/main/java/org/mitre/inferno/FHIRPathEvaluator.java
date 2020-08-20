@@ -1,5 +1,6 @@
 package org.mitre.inferno;
 
+import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,10 +40,7 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
         case "decimal":
           return value;
         default: // TODO: handle date, dateTime, etc. appropriately
-          return '"'
-              + value.replace("\\", "\\\\")
-                  .replace("\"", "\\\"")
-              + '"';
+          return new Gson().toJson(value);
       }
     }
     try {
