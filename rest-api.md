@@ -73,7 +73,7 @@ the JSON or XML FHIR resource to serve as the root resource when evaluating the 
 - **Response:**
 a JSON array representing the result of evaluating the given expression against the given root resource.
 Each "result" in the returned array will be in the form
-`{ "type": "[FHIR datatype name]", "value": [JSON representation of result] }`.
+`{ "type": "[FHIR datatype name]", "element": [JSON representation of element] }`.
 
 # Example Requests and Responses
 

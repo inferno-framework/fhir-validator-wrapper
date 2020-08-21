@@ -27,22 +27,22 @@ class FHIRPathEvaluatorTest {
     Resource patient = loadResource("patient_fixture.json");
     assertEquals("[]", pathEvaluator.evaluateToString(patient, "Patient.foo"));
     assertEquals(
-        "[{\"type\":\"string\",\"value\":\"234\"}]",
+        "[{\"type\":\"string\",\"element\":\"234\"}]",
         pathEvaluator.evaluateToString(patient, "Patient.id.substring(1,3)")
     );
     assertEquals(
         "["
-            + "{\"type\":\"string\",\"value\":\"A\"},"
-            + "{\"type\":\"string\",\"value\":\"B\"},"
-            + "{\"type\":\"string\",\"value\":\"C\"}"
+            + "{\"type\":\"string\",\"element\":\"A\"},"
+            + "{\"type\":\"string\",\"element\":\"B\"},"
+            + "{\"type\":\"string\",\"element\":\"C\"}"
             + "]",
         pathEvaluator.evaluateToString(patient, "Patient.name.given")
     );
     assertEquals(
         "["
-            + "{\"type\":\"HumanName\",\"value\":{\"given\":[\"A\"]}},"
-            + "{\"type\":\"HumanName\",\"value\":{\"given\":[\"B\"]}},"
-            + "{\"type\":\"HumanName\",\"value\":{\"given\":[\"C\"]}}"
+            + "{\"type\":\"HumanName\",\"element\":{\"given\":[\"A\"]}},"
+            + "{\"type\":\"HumanName\",\"element\":{\"given\":[\"B\"]}},"
+            + "{\"type\":\"HumanName\",\"element\":{\"given\":[\"C\"]}}"
             + "]",
         pathEvaluator.evaluateToString(patient, "Patient.name")
     );

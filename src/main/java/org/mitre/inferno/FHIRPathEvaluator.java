@@ -27,7 +27,7 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
   }
 
   private String baseToJson(Base item) {
-    return String.format("{\"type\":\"%s\",\"value\":%s}", item.fhirType(), baseToString(item));
+    return String.format("{\"type\":\"%s\",\"element\":%s}", item.fhirType(), baseToString(item));
   }
 
   String baseToString(Base item) {
