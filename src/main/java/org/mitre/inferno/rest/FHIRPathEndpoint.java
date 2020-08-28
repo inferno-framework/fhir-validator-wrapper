@@ -3,10 +3,9 @@ package org.mitre.inferno.rest;
 import static spark.Spark.post;
 
 import java.io.IOException;
-import org.hl7.fhir.r5.elementmodel.Manager;
-import org.hl7.fhir.r5.formats.FormatUtilities;
-import org.hl7.fhir.r5.model.Resource;
+import org.hl7.fhir.r4.model.Base;
 import org.mitre.inferno.FHIRPathEvaluator;
+import org.mitre.inferno.JsonParser;
 
 public class FHIRPathEndpoint {
   private static FHIRPathEndpoint fhirPathEndpoint = null;
@@ -36,13 +35,12 @@ public class FHIRPathEndpoint {
   private void createRoutes() {
     post("/evaluate", (req, res) -> {
       res.type("application/fhir+json");
-      return evaluate(req.bodyAsBytes(), req.queryParams("path"));
+      return evaluate(req.body(), req.queryParams("type"), req.queryParams("path"));
     });
   }
 
-  private String evaluate(byte[] body, String path) throws IOException {
-    Manager.FhirFormat fmt = FormatUtilities.determineFormat(body);
-    Resource rootResource = FormatUtilities.makeParser(fmt).parse(body);
-    return pathEvaluator.evaluateToString(rootResource, path);
+  private String evaluate(String body, String type, String path) throws IOException {
+    Base rootElement = new JsonParser().parse(body, type);
+    return pathEvaluator.evaluateToString(rootElement, path);
   }
 }
