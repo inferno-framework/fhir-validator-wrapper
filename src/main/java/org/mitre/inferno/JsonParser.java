@@ -6,8 +6,11 @@ import com.google.gson.JsonObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.formats.JsonCreatorCanonical;
 import org.hl7.fhir.r4.formats.JsonCreatorDirect;
@@ -26,6 +29,8 @@ public class JsonParser extends org.hl7.fhir.r4.formats.JsonParser {
     JsonObject obj = (JsonObject) json;
     if (obj.has("resourceType")) {
       return parse(obj);
+    } else if (type.contains(".")) {
+      return parseBackboneElement(obj, type);
     } else {
       return parseType(obj, type);
     }
@@ -78,18 +83,15 @@ public class JsonParser extends org.hl7.fhir.r4.formats.JsonParser {
     }
   }
 
-  private String composeBackboneElement(BackboneElement element) throws IOException {
-    Class<?> clazz = element.getClass();
-    Class<?> enclosing = clazz.getEnclosingClass();
-    String methodName = "compose"
-        + (enclosing != null ? enclosing.getSimpleName() + clazz.getSimpleName() : "Backbone");
-    Method method;
+  private Base parseBackboneElement(JsonObject json, String type) {
     try {
-      method = getClass().getSuperclass().getDeclaredMethod(methodName, String.class, clazz);
-    } catch (NoSuchMethodException e) {
-      throw new IllegalArgumentException("Could not find method '" + methodName + "'.", e);
+      return (Base) getParseMethod(type).invoke(this, json, null);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to parse BackboneElement", e);
     }
+  }
 
+  private String composeBackboneElement(BackboneElement element) throws IOException {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     OutputStreamWriter osw = new OutputStreamWriter(bytes, StandardCharsets.UTF_8);
     if (style == OutputStyle.CANONICAL) {
@@ -100,13 +102,54 @@ public class JsonParser extends org.hl7.fhir.r4.formats.JsonParser {
     }
     json.setIndent(style == OutputStyle.PRETTY ? "  " : "");
     try {
-      method.invoke(this, null, element);
+      getComposeMethod(element).invoke(this, null, element);
     } catch (Exception e) {
-      throw new RuntimeException("Error invoking method", e);
+      throw new RuntimeException("Failed to compose BackboneElement", e);
     } finally {
       json.finish();
       osw.flush();
     }
     return bytes.toString();
+  }
+
+  private Method getParseMethod(String path) throws ClassNotFoundException, NoSuchMethodException {
+    Class<?> elementClass = getModelClassForPath(path);
+    Class<?> modelClass = getModelClass(path.split("\\.")[0]);
+    String methodName = "parse" + getBackboneElementName(elementClass);
+    return getClass().getSuperclass().getDeclaredMethod(methodName, JsonObject.class, modelClass);
+  }
+
+  private Method getComposeMethod(BackboneElement element) throws NoSuchMethodException {
+    Class<?> elementClass = element.getClass();
+    String methodName = "compose" + getBackboneElementName(elementClass);
+    return getClass().getSuperclass().getDeclaredMethod(methodName, String.class, elementClass);
+  }
+
+  private Class<?> getModelClassForPath(String path) throws ClassNotFoundException {
+    try {
+      String[] pathParts = path.split("\\.");
+      Class<?> clazz = getModelClass(pathParts[0]);
+      for (int i = 1; i < pathParts.length; i++) {
+        String part = pathParts[i];
+        Field field = clazz.getDeclaredField(part);
+        clazz = field.getType();
+        if (List.class.isAssignableFrom(clazz)) {
+          ParameterizedType type = (ParameterizedType) field.getGenericType();
+          clazz = (Class<?>) type.getActualTypeArguments()[0];
+        }
+      }
+      return clazz;
+    } catch (Exception e) {
+      throw new ClassNotFoundException("Could not find class for path '" + path + "'", e);
+    }
+  }
+
+  private Class<?> getModelClass(String name) throws ClassNotFoundException {
+    return Class.forName("org.hl7.fhir.r4.model." + name);
+  }
+
+  private String getBackboneElementName(Class<?> clazz) {
+    Class<?> enclosing = clazz.getEnclosingClass();
+    return enclosing.getSimpleName() + clazz.getSimpleName();
   }
 }
