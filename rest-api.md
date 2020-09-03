@@ -69,9 +69,10 @@ the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#load
 - **Query Params:**
 `path=[FHIRPath expression]` (Required)
 - **Body:**
-the JSON or XML FHIR resource to serve as the root resource when evaluating the expression
+the JSON or XML FHIR element to serve as the root element when evaluating the expression. Accepts all
+complex datatypes (i.e. full resources, Elements, BackboneElements) but not primitives.
 - **Response:**
-a JSON array representing the result of evaluating the given expression against the given root resource.
+a JSON array representing the result of evaluating the given expression against the given root element.
 Each "result" in the returned array will be in the form
 `{ "type": "[FHIR datatype name]", "element": [JSON representation of element] }`.
 
