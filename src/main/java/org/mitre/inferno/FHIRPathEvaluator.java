@@ -3,6 +3,7 @@ package org.mitre.inferno;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.context.SimpleWorkerContext;
 import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.utils.FHIRPathEngine;
@@ -22,7 +23,11 @@ public class FHIRPathEvaluator extends FHIRPathEngine {
   }
 
   private String baseToJson(Base item) {
-    String repr = new JsonParser().composeString(item);
-    return String.format("{\"type\":\"%s\",\"element\":%s}", item.fhirType(), repr);
+    try {
+      String repr = new JsonParser().composeBase(item);
+      return String.format("{\"type\":\"%s\",\"element\":%s}", item.fhirType(), repr);
+    } catch (IOException e) {
+      throw new FHIRException("Failed to convert base to JSON", e);
+    }
   }
 }

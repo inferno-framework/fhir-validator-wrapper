@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.formats.JsonCreatorCanonical;
 import org.hl7.fhir.r4.formats.JsonCreatorDirect;
 import org.hl7.fhir.r4.model.BackboneElement;
@@ -36,22 +35,18 @@ public class JsonParser extends org.hl7.fhir.r4.formats.JsonParser {
     }
   }
 
-  public String composeString(Base item) {
+  public String composeBase(Base item) throws IOException {
     String type = item.fhirType();
-    try {
-      if (item.isPrimitive()) {
-        return composePrimitive(item);
-      } else if (item.isResource()) {
-        return composeString((Resource) item);
-      } else if (item instanceof Type) {
-        return composeString((Type) item, type);
-      } else if (item instanceof BackboneElement) {
-        return composeBackboneElement((BackboneElement) item);
-      } else {
-        throw new IllegalArgumentException("Unsupported type '" + type + "'.");
-      }
-    } catch (IOException e) {
-      throw new FHIRException("Failed to compose item of type '" + type + "'.", e);
+    if (item.isPrimitive()) {
+      return composePrimitive(item);
+    } else if (item.isResource()) {
+      return composeString((Resource) item);
+    } else if (item instanceof Type) {
+      return composeString((Type) item, type);
+    } else if (item instanceof BackboneElement) {
+      return composeBackboneElement((BackboneElement) item);
+    } else {
+      throw new IllegalArgumentException("Unsupported type '" + type + "'.");
     }
   }
 
