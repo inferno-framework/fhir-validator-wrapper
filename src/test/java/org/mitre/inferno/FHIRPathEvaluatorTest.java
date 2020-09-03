@@ -41,6 +41,26 @@ class FHIRPathEvaluatorTest {
             + "]",
         pathEvaluator.evaluateToString(patient, "Patient.name")
     );
+    assertEquals(
+        "["
+          + "{"
+            + "\"type\":\"Patient.communication\","
+              + "\"element\":{"
+                + "\"language\":{"
+                  + "\"coding\":["
+                    + "{"
+                      + "\"system\":\"urn:ietf:bcp:47\","
+                      + "\"code\":\"en-US\","
+                      + "\"display\":\"English (United States)\""
+                    + "}"
+                  + "]"
+                + "},"
+              + "\"preferred\":true"
+            + "}"
+          + "}"
+        + "]",
+        pathEvaluator.evaluateToString(patient, "Patient.communication.where(preferred = true)")
+    );
   }
 
   private Resource loadResource(String filename) throws IOException {
