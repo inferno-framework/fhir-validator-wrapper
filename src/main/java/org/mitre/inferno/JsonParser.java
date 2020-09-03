@@ -20,6 +20,16 @@ import org.hl7.fhir.r4.model.Type;
 
 public class JsonParser extends org.hl7.fhir.r4.formats.JsonParser {
 
+  /**
+   * Parses the given string into an R4 FHIR model class. Supports all complex datatypes
+   * (Resources, Types, BackboneElements) but not primitives. The type parameter is required
+   * for parsing Types and BackboneElements, but is ignored for parsing Resources.
+   *
+   * @param input the input to parse
+   * @param type the FHIR type to parse the input into (e.g. "HumanName" or "Patient.contact")
+   * @return the FHIR model instance representing the parsed input
+   * @throws IOException if there was an error parsing the input
+   */
   public Base parse(String input, String type) throws IOException {
     JsonElement json = com.google.gson.JsonParser.parseString(input);
     if (!json.isJsonObject()) {
@@ -35,6 +45,13 @@ public class JsonParser extends org.hl7.fhir.r4.formats.JsonParser {
     }
   }
 
+  /**
+   * Converts the given Base element into its string representation.
+   *
+   * @param item the element to serialize
+   * @return the string representation of the input element
+   * @throws IOException if there was an error serializing the input
+   */
   public String composeBase(Base item) throws IOException {
     String type = item.fhirType();
     if (item.isPrimitive()) {
