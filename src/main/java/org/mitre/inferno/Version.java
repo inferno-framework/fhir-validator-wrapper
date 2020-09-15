@@ -1,24 +1,23 @@
 package org.mitre.inferno;
 
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Properties;
+import org.slf4j.LoggerFactory;
 
 public class Version {
   private static final String version;
 
   static {
-    String temp_version;
+    String tempVersion;
     try {
       Properties properties = new Properties();
       properties.load(Version.class.getClassLoader().getResourceAsStream("version.properties"));
-      temp_version = properties.getProperty("version");
+      tempVersion = properties.getProperty("version");
     } catch (IOException e) {
-      temp_version = null;
-      LoggerFactory.getLogger(Version.class).error("Failed to retrieve version: " +e.getMessage());
+      tempVersion = null;
+      LoggerFactory.getLogger(Version.class).error("Failed to retrieve version: " + e.getMessage());
     }
-    version = temp_version;
+    version = tempVersion;
   }
 
   public static String getVersion() {
