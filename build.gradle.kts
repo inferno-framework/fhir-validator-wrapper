@@ -13,6 +13,11 @@ repositories {
     maven {
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }
+    // Import from local directory:
+    // https://stackoverflow.com/questions/20700053/how-to-add-local-jar-file-dependency-to-build-gradle-file
+    flatDir {
+        dirs("libs")
+    }
 }
 
 dependencies {
