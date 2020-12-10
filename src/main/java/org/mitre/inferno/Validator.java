@@ -19,11 +19,11 @@ import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
 import org.hl7.fhir.utilities.VersionUtilities;
-import org.hl7.fhir.utilities.cache.FilesystemPackageCacheManager;
-import org.hl7.fhir.utilities.cache.NpmPackage;
-import org.hl7.fhir.utilities.cache.ToolsVersion;
+import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager;
+import org.hl7.fhir.utilities.npm.NpmPackage;
+import org.hl7.fhir.utilities.npm.ToolsVersion;
 import org.hl7.fhir.validation.ValidationEngine;
-import org.hl7.fhir.validation.VersionUtil;
+import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
 
 public class Validator {
@@ -94,7 +94,8 @@ public class Validator {
    */
   public OperationOutcome validate(byte[] resource, List<String> profiles) throws Exception {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
-    return hl7Validator.validate(null, resource, fmt, profiles);
+    ByteArrayInputStream resourceStream = new ByteArrayInputStream(resource);
+    return hl7Validator.validate(fmt, resourceStream, profiles);
   }
 
   /**
