@@ -17,7 +17,7 @@ jobs:
       matrix:
         java: [8.x, 14.x]
 
-    name: Java ${{ matrix.java }} sample
+    name: Java ${{ matrix.java }} Build
     steps:
       - uses: actions/checkout@v2
       - name: Setup java
