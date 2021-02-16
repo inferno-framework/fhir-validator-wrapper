@@ -5,6 +5,7 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.put;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.hl7.fhir.r5.formats.JsonParser;
@@ -76,7 +77,13 @@ public class ValidatorEndpoint {
    * @throws Exception if the resource cannot be loaded or validated
    */
   private String validateResource(byte[] resource, String profile) throws Exception {
-    List<String> patientProfiles = Arrays.asList(profile.split(","));
+    List<String> patientProfiles;
+    if (profile != null) {
+      patientProfiles = Arrays.asList(profile.split(","));
+    } else {
+      patientProfiles = new ArrayList<String>();
+    }
+
     OperationOutcome oo = validator.validate(resource, patientProfiles);
     return new JsonParser().composeString(oo);
   }

@@ -13,15 +13,23 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
+import org.hl7.fhir.r5.model.CodeType;
+import org.hl7.fhir.r5.model.CodeableConcept;
 import org.hl7.fhir.r5.model.FhirPublication;
 import org.hl7.fhir.r5.model.ImplementationGuide;
+import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.OperationOutcome;
+import org.hl7.fhir.r5.model.OperationOutcome.IssueType;
+import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
 import org.hl7.fhir.utilities.VersionUtilities;
 import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.npm.NpmPackage;
 import org.hl7.fhir.utilities.npm.ToolsVersion;
+import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
+import org.hl7.fhir.validation.BaseValidator;
+import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
@@ -46,6 +54,14 @@ public class Validator {
     final String fhirVersion = "4.0.1";
 
     hl7Validator = new ValidationEngine(definitions);
+    
+    // The two lines below turn off URL resolution checking in the validator. 
+    // This eliminates the need to silence these errors elsewhere in Inferno
+    // And also keeps contained resources from failing validation based solely on URL errors
+    ValidationControl vc = new BaseValidator(null, null)
+                             .new ValidationControl(false, IssueSeverity.INFORMATION);
+    hl7Validator.getValidationControl().put("Type_Specific_Checks_DT_URL_Resolve", vc);
+
     hl7Validator.loadIg(igFile, true);
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setNative(false);
@@ -90,12 +106,25 @@ public class Validator {
    * @param resource a byte array representation of a FHIR resource
    * @param profiles a list of profile URLs to validate against
    * @return an OperationOutcome resource representing the result of the validation operation
-   * @throws Exception if there was an error validating the resource
    */
-  public OperationOutcome validate(byte[] resource, List<String> profiles) throws Exception {
+  public OperationOutcome validate(byte[] resource, List<String> profiles) {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
     ByteArrayInputStream resourceStream = new ByteArrayInputStream(resource);
-    return hl7Validator.validate(fmt, resourceStream, profiles);
+    OperationOutcome oo;
+    try {
+      oo = hl7Validator.validate(fmt, resourceStream, profiles);
+    } catch (Exception e) {
+      // Add our own OperationOutcome for errors that break the ValidationEngine
+      OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.FATAL;
+      OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(sev, IssueType.STRUCTURE);
+      issue.setDiagnostics(e.getMessage());
+      issue.setDetails(new CodeableConcept().setText(e.getMessage()));
+      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line", new IntegerType(2));
+      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col", new IntegerType(1));
+      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source", new CodeType("ValidationService"));
+      oo = new OperationOutcome(issue);
+    }
+    return oo;
   }
 
   /**
