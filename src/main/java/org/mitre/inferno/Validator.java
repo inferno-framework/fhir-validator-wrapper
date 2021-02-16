@@ -119,7 +119,7 @@ public class Validator {
       OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(sev, IssueType.STRUCTURE);
       issue.setDiagnostics(e.getMessage());
       issue.setDetails(new CodeableConcept().setText(e.getMessage()));
-      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line", new IntegerType(2));
+      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line", new IntegerType(1));
       issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col", new IntegerType(1));
       issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source", new CodeType("ValidationService"));
       oo = new OperationOutcome(issue);
