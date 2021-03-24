@@ -30,6 +30,7 @@ import org.hl7.fhir.utilities.npm.ToolsVersion;
 import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
 import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
+import org.hl7.fhir.validation.IgLoader;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
@@ -62,9 +63,10 @@ public class Validator {
                              .new ValidationControl(false, IssueSeverity.INFORMATION);
     hl7Validator.getValidationControl().put("Type_Specific_Checks_DT_URL_Resolve", vc);
 
-    hl7Validator.loadIg(igFile, true);
+    hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), igFile, true);
+
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
-    hl7Validator.setNative(false);
+    hl7Validator.setDoNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.prepare();
 
@@ -193,7 +195,7 @@ public class Validator {
     NpmPackage npm = findCustomPackage(id, version);
     // Fallback to packages from packages.fhir.org if no custom packages match
     if (npm == null) {
-      hl7Validator.loadIg(id + (version != null ? "#" + version : ""), true);
+      hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), id + (version != null ? "#" + version : ""), true);
       npm = packageManager.loadPackage(id, version);
     }
     return IgResponse.fromPackage(npm);
@@ -210,7 +212,7 @@ public class Validator {
     temp.deleteOnExit();
     try {
       FileUtils.writeByteArrayToFile(temp, content);
-      hl7Validator.loadIg(temp.getCanonicalPath(), true);
+      hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), temp.getCanonicalPath(), true);
     } finally {
       temp.delete();
     }
