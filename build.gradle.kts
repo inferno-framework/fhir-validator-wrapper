@@ -18,12 +18,13 @@ dependencies {
     // https://chat.fhir.org/#narrow/stream/179166-implementers/topic/New.20validator.20JAR.20location
     // the ig-publisher uses this one too
     // https://github.com/HL7/fhir-ig-publisher/blob/master/pom.xml#L68
-    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "5.2.10")
+    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "5.3.6")
 
     // validator dependencies (should be able to get these automatically?)
     implementation("org.apache.commons","commons-compress", "1.19")
     implementation("org.apache.httpcomponents", "httpclient", "4.5.10")
     implementation("org.fhir", "ucum", "1.0.2")
+    implementation("com.squareup.okhttp3", "okhttp", "4.9.0")
 
     // GSON for our JSON needs
     implementation("com.google.code.gson", "gson", "2.8.6")
