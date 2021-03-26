@@ -45,6 +45,12 @@ public class ValidatorEndpoint {
           return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
         });
 
+    post("/:resource/$validate",
+        (req, res) -> {
+          res.type("application/fhir+json");
+          return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
+        });
+
     get("/resources", (req, res) -> validator.getResources(), TO_JSON);
 
     get("/profiles", (req, res) -> validator.getStructures(), TO_JSON);

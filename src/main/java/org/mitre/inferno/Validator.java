@@ -235,7 +235,9 @@ public class Validator {
     return igs
         .stream()
         .collect(Collectors.toMap(
-            ImplementationGuide::getPackageId,
+            ig -> {
+              return ig.getPackageId() + "|" + ig.getVersionElement();
+            },
             ig -> {
               try {
                 return getIg(ig.getPackageId(), ig.getVersion()).getProfiles();
