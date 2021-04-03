@@ -34,6 +34,8 @@ import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
 
+import static java.util.stream.Collectors.*;
+
 public class Validator {
   private final ValidationEngine hl7Validator;
   private final FilesystemPackageCacheManager packageManager;
@@ -230,23 +232,21 @@ public class Validator {
    *
    * @return a mapping from IG URL to a list of profile URLs supported by the IG.
    */
-  public Map<String, List<String>> getProfilesByIg() {
+  public Map<String, Map<String, List<String>>> getProfilesByIg() {
     List<ImplementationGuide> igs = hl7Validator.getContext().allImplementationGuides();
     return igs
         .stream()
-        .collect(Collectors.toMap(
-            ig -> {
-              return ig.getPackageId() + "|" + ig.getVersionElement();
-            },
-            ig -> {
-              try {
-                return getIg(ig.getPackageId(), ig.getVersion()).getProfiles();
-              } catch (IOException e) {
-                return new ArrayList<>();
-              }
-            },
-            (existing, replacement) -> existing
-        ));
+        .collect(groupingBy(ImplementationGuide::getPackageId, toMap(
+                ImplementationGuide::getVersion,
+                ig -> {
+                  try {
+                    return getIg(ig.getPackageId(), ig.getVersion()).getProfiles();
+                  } catch (IOException e) {
+                    return new ArrayList<>();
+                  }
+                },
+                (existing, replacement) -> existing
+        )));
   }
 
   public String getVersion() {

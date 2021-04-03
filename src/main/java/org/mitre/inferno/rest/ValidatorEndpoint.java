@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.OperationOutcome;
+import org.mitre.inferno.CapabilityStatementGenerator;
 import org.mitre.inferno.Validator;
 import org.mitre.inferno.Version;
 
@@ -72,6 +73,8 @@ public class ValidatorEndpoint {
         TO_JSON);
 
     get("/version", (req, res) -> Version.getVersion());
+
+    get("/metadata", (req, res) -> CapabilityStatementGenerator.generateCapabilityStatement());
   }
 
   /**
