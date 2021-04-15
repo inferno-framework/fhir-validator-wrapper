@@ -47,3 +47,4 @@ gradle-app.setting
 
 # Mac Stuff
 .DS_Store
+.project
