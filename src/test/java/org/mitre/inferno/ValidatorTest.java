@@ -103,15 +103,14 @@ public class ValidatorTest {
   @Test
   void loadIg() throws Exception {
     List<String> profilesToLoad = Arrays.asList(
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-condition-parent",
+        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-comorbidities-parent",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-disease-status",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-genetic-variant",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-genomics-report",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-statement",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-radiation-procedure",
+        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-request",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-surgical-procedure",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-stage-parent"
+        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-stage-group"
     );
     assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
