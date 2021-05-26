@@ -48,7 +48,7 @@ public class Endpoints {
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-      res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Origin, Content-Type");
+      res.header("Access-Control-Allow-Headers", "*");
     });
 
     // This responds to OPTIONS requests, used by browsers to "preflight" check CORS requests,
