@@ -3,7 +3,6 @@ package org.mitre.inferno;
 import java.io.IOException;
 import java.util.Date;
 
-import org.checkerframework.checker.units.qual.C;
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.CapabilityStatement;
 import org.hl7.fhir.r5.model.Enumerations;
