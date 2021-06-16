@@ -34,7 +34,7 @@ public class App {
   private static Validator initializeValidator() {
     Logger logger = LoggerFactory.getLogger(App.class);
     try {
-      return new Validator("./igs/package");
+      return new Validator("./igs");
     } catch (Exception e) {
       logger.error("There was an error initializing the validator:", e);
       System.exit(1);
