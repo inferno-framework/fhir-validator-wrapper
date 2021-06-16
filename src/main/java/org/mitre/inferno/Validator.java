@@ -30,7 +30,6 @@ import org.hl7.fhir.utilities.npm.ToolsVersion;
 import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
 import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
-import org.hl7.fhir.validation.IgLoader;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
@@ -43,10 +42,10 @@ public class Validator {
   /**
    * Creates the HL7 Validator to which can then be used for validation.
    *
-   * @param igFile The igFile the validator is loaded with.
+   * @param igDir A directory containing tarred/gzipped IG packages
    * @throws Exception If the validator cannot be created
    */
-  public Validator(String igFile) throws Exception {
+  public Validator(String igDir) throws Exception {
     final String fhirSpecVersion = "4.0";
     final String definitions = VersionUtilities.packageForVersion(fhirSpecVersion)
         + "#" + VersionUtilities.getCurrentVersion(fhirSpecVersion);
@@ -63,7 +62,12 @@ public class Validator {
                              .new ValidationControl(false, IssueSeverity.INFORMATION);
     hl7Validator.getValidationControl().put("Type_Specific_Checks_DT_URL_Resolve", vc);
 
-    hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), igFile, true);
+    // Get all the package gzips in the "igs/package" directory
+    File dir = new File(igDir);
+    File[] igFiles = dir.listFiles((d, name) -> name.endsWith(".tgz"));
+    for(File igFile : igFiles) {
+      hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), igFile.getAbsolutePath(), true);
+    }
 
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setDoNative(false);
