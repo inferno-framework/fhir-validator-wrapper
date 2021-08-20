@@ -74,7 +74,9 @@ public class ValidatorEndpoint {
 
     get("/version", (req, res) -> Version.getVersion());
 
-    get("/metadata", (req, res) -> CapabilityStatementGenerator.generateCapabilityStatement());
+    // mokeefe 2021-08-20:
+    // Commented out because CapabilityStatementGenerator isn't fully functional yet
+    // get("/metadata", (req, res) -> CapabilityStatementGenerator.generateCapabilityStatement());
   }
 
   /**
@@ -86,14 +88,14 @@ public class ValidatorEndpoint {
    * @throws Exception if the resource cannot be loaded or validated
    */
   private String validateResource(byte[] resource, String profile) throws Exception {
-    List<String> patientProfiles;
+    List<String> splitProfiles;
     if (profile != null) {
-      patientProfiles = Arrays.asList(profile.split(","));
+      splitProfiles = Arrays.asList(profile.split(","));
     } else {
-      patientProfiles = new ArrayList<String>();
+      splitProfiles = new ArrayList<String>();
     }
 
-    OperationOutcome oo = validator.validate(resource, patientProfiles);
+    OperationOutcome oo = validator.validate(resource, splitProfiles);
     return new JsonParser().composeString(oo);
   }
 }

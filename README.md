@@ -1,7 +1,5 @@
 # HL7 FHIR Validation Service
 
-[![Build Status](https://travis-ci.com/inferno-community/fhir-validator-wrapper.svg?branch=master)](https://travis-ci.com/inferno-community/fhir-validator-wrapper)
-
 The `fhir-validator-wrapper` provides a persistent service for executing the 
 [FHIR® Validator](https://wiki.hl7.org/Using_the_FHIR_Validator). It is intended to provide validation capabilities
 to other applications that integrate it.

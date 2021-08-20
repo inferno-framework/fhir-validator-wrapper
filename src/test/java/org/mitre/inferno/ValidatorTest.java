@@ -97,7 +97,7 @@ public class ValidatorTest {
   @Test
   void getKnownIGs() throws IOException {
     Set<String> knownIGs = validator.getKnownIGs().keySet();
-    assertTrue(knownIGs.contains("hl7.fhir.r4.core"));
+    assertTrue(knownIGs.contains("hl7.fhir.r4.core#4.0.1"));
   }
 
   @Test

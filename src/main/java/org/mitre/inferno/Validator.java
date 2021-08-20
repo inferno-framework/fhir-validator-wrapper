@@ -2,6 +2,7 @@ package org.mitre.inferno;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
 import org.hl7.fhir.utilities.VersionUtilities;
-import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager;
+import org.hl7.fhir.utilities.npm.InfernoFilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.npm.NpmPackage;
 import org.hl7.fhir.utilities.npm.ToolsVersion;
 import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
@@ -38,7 +39,7 @@ import static java.util.stream.Collectors.*;
 
 public class Validator {
   private final ValidationEngine hl7Validator;
-  private final FilesystemPackageCacheManager packageManager;
+  private final InfernoFilesystemPackageCacheManager packageManager;
   private final Map<String, NpmPackage> loadedPackages;
 
   /**
@@ -67,17 +68,18 @@ public class Validator {
     // Get all the package gzips in the "igs/package" directory
     File dir = new File(igDir);
     File[] igFiles = dir.listFiles((d, name) -> name.endsWith(".tgz"));
+    packageManager = new InfernoFilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
+    loadedPackages = new HashMap<>();
     for (File igFile : igFiles) {
       hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), igFile.getAbsolutePath(), true);
+      NpmPackage npm = NpmPackage.fromPackage(new FileInputStream(igFile));
+      loadedPackages.put(npm.id() + "#" + npm.version(), npm);
     }
 
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setDoNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.prepare();
-
-    packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
-    loadedPackages = new HashMap<>();
   }
 
   /**
@@ -140,15 +142,19 @@ public class Validator {
    *
    * @return a map containing each known IG ID and its corresponding canonical URL.
    */
-  public Map<String, String> getKnownIGs() throws IOException {
+  public Map<String, String> getKnownIGs() throws IOException {    
     Map<String, String> igs = new HashMap<>();
     // Add known custom IGs
     for (Map.Entry<String, NpmPackage> e : loadedPackages.entrySet()) {
-      String id = e.getKey().split("#")[0];
+      String id = e.getKey();
+      System.out.println(e.getKey());
       String canonical = e.getValue().canonical();
+      // Create versioned canonical, if it doesn't already exist
+      if (!canonical.contains("|") && !e.getValue().version().isEmpty()) {
+        canonical = canonical + "|" + e.getValue().version();
+      }
       igs.put(id, canonical);
     }
-    // Add IGs known to the package manager, replacing any conflicting package IDs
     packageManager.listAllIds(igs);
     return igs;
   }
