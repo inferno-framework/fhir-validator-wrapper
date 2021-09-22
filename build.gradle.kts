@@ -69,9 +69,9 @@ val testCoverage by tasks.registering {
 val fatJar = task("fatJar", type = Jar::class) {
     baseName = "${project.name}-fat"
     manifest {
-        attributes["Implementation-Title"] = "FHIR Validator Wrapper"
-        attributes["Implementation-Version"] = project.version
-        attributes["Main-Class"] = "org.mitre.inferno.rest.Validate"
+        attributes("Implementation-Title" to "FHIR Validator Wrapper",
+        "Implementation-Version" to project.version,
+        "Main-Class" to "org.mitre.inferno.rest.Validate")
     }
     from(configurations.runtimeClasspath.get().map({ if (it.isDirectory) it else zipTree(it) }))
     with(tasks.jar.get() as CopySpec)
