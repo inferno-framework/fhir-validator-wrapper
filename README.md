@@ -60,6 +60,18 @@ Run without terminology validation:
 docker run -p 4567:4567 --env DISABLE_TX=true hl7_validator
 ```
 
+## Creating an Uber Jar
+
+An uber jar can be created with:
+
+```shell
+./gradlew uberJar
+```
+
+By default, the uber jar will be located in `build/lib/`.
+
+This uber jar can be executed with `java -jar InfernoValidationService-<version>-uber.jar`
+
 ## Contact Us
 The Inferno development team can be reached by email at inferno@groups.mitre.org.  Inferno also has a dedicated [HL7 FHIR chat channel](https://chat.fhir.org/#narrow/stream/153-inferno).
 
