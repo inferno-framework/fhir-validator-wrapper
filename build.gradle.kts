@@ -43,7 +43,7 @@ configure<JavaPluginConvention> {
 }
 
 application {
-    mainClassName = "org.mitre.inferno.App"
+    mainClass.set("org.mitre.inferno.App")
 }
 
 checkstyle {
@@ -66,21 +66,23 @@ val testCoverage by tasks.registering {
     jacocoTestReport?.mustRunAfter(tasks.findByName("test"))
 }
 
-val fatJar = task("fatJar", type = Jar::class) {
-    baseName = "${project.name}-fat"
+
+tasks.register<Jar>("uberJar") {
+    archiveClassifier.set("uber")
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+
     manifest {
         attributes("Implementation-Title" to "FHIR Validator Wrapper",
-        "Implementation-Version" to project.version,
-        "Main-Class" to "org.mitre.inferno.rest.Validate")
+            "Implementation-Version" to project.version,
+            "Main-Class" to "org.mitre.inferno.App")
     }
-    from(configurations.runtimeClasspath.get().map({ if (it.isDirectory) it else zipTree(it) }))
-    with(tasks.jar.get() as CopySpec)
-}
 
-tasks {
-    "build" {
-        dependsOn(fatJar)
-    }
+    from(sourceSets.main.get().output)
+
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
 }
 
 val setVersion = tasks.processResources {
