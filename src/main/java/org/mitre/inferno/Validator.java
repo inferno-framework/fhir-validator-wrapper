@@ -65,8 +65,10 @@ public class Validator {
     // Get all the package gzips in the "igs/package" directory
     File dir = new File(igDir);
     File[] igFiles = dir.listFiles((d, name) -> name.endsWith(".tgz"));
-    for (File igFile : igFiles) {
-      hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), igFile.getAbsolutePath(), true);
+    if (igFiles != null) {
+      for (File igFile : igFiles) {
+        hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), igFile.getAbsolutePath(), true);
+      }
     }
 
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
