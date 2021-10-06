@@ -1,0 +1,7 @@
+{
+  "resourceType" : "StructureDefinition",
+  "name": "foo",
+  "url" : "http://hl7.org/fhir/StructureDefinition/foo",
+  "version" : "4.0.1",
+  "status" : "draft"
+}

@@ -249,6 +249,15 @@ public class Validator {
         ));
   }
 
+  /**
+   * Get the version of the validator.
+   * 
+   * @return the validator version as a string
+   */
+  public String getValidatorVersion() {
+    return hl7Validator.getVersion();
+  }
+
   public String getVersion() {
     return VersionUtil.getVersion();
   }
