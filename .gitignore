@@ -44,6 +44,8 @@ gradle-app.setting
 
 # IDE
 .idea
+.classpath
+.project
 
 # Mac Stuff
 .DS_Store
