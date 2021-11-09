@@ -38,8 +38,9 @@ dependencies {
     testImplementation("org.junit.jupiter", "junit-jupiter", "5.5.2")
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
+java {
+    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_11
 }
 
 application {

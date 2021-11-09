@@ -1,4 +1,4 @@
-FROM openjdk:8 AS build
+FROM openjdk:11 AS build
 WORKDIR /home
 # Grab Gradle first so it can be cached
 COPY gradle gradle
@@ -15,7 +15,7 @@ COPY src src
 RUN ./gradlew build
 RUN tar -xvf build/distributions/InfernoValidationService-*.tar
 
-FROM openjdk:8
+FROM openjdk:11
 WORKDIR /home
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
 

@@ -12,7 +12,7 @@ to other applications that integrate it.
 
 ## Installation
 
-**System Requirements:** The Validation Service requires Java 1.8 or above.
+**System Requirements:** The Validation Service requires Java 11 or above.
 
 ## Running Locally with Java
 
