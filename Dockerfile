@@ -1,4 +1,8 @@
 FROM openjdk:8 AS build
+
+# Get MITRE-specific certs when built in internally
+RUN wget -q -O - --no-check-certificate https://gitlab.mitre.org/mitre-scripts/mitre-pki/raw/master/os_scripts/install_certs.sh | MODE=ubuntu sh
+
 WORKDIR /home
 # Grab Gradle first so it can be cached
 COPY gradle gradle
