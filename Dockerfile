@@ -1,6 +1,6 @@
-FROM openjdk:8 AS build
+FROM openjdk:11 AS build
 
-# RUN curl -ksSL https://gitlab.mitre.org/mitre-scripts/mitre-pki/raw/master/os_scripts/install_certs.sh | JAVA_HOME=/usr/local/openjdk-8 MODE=java sh
+# RUN curl -ksSL https://gitlab.mitre.org/mitre-scripts/mitre-pki/raw/master/os_scripts/install_certs.sh | JAVA_HOME=/usr/local/openjdk-11 MODE=java sh
 # If using under Zscalar, comment out the above and run using: 'docker build --no-cache -t hl7_validator .'
 
 WORKDIR /home
@@ -19,7 +19,7 @@ COPY src src
 RUN ./gradlew build
 RUN tar -xvf build/distributions/InfernoValidationService-*.tar
 
-FROM openjdk:8
+FROM openjdk:11
 WORKDIR /home
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0"
 
