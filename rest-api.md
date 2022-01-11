@@ -63,13 +63,13 @@ the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#load
 
 ### Get this wrapper's version
 - **Route:**
-`GET /wrapper-version`
+`GET /version`
 - **Response:**
 A string representing the version of the wrapper being used.
 
 ### Get the validator's version 
 - **Route:**
-`GET /version`
+`GET /validator-version`
 - **Response:**
 A string representing which HL7 validator version is being used.
 
