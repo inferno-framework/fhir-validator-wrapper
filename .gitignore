@@ -43,9 +43,13 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 # IDE
+**/vscode
 .idea
 .classpath
 .project
 
 # Mac Stuff
 .DS_Store
+
+# Build output directories
+**/bin
