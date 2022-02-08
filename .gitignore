@@ -43,7 +43,7 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 # IDE
-**/vscode
+**/.vscode
 .idea
 .classpath
 .project
