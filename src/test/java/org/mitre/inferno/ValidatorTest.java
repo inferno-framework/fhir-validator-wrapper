@@ -105,8 +105,8 @@ public class ValidatorTest {
     List<String> profilesToLoad = Arrays.asList(
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-comorbidities-parent",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-disease-status",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-genetic-variant",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-genomics-report",
+        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-genomic-variant",
+        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-genomics-report",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-request",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-surgical-procedure",
@@ -115,7 +115,7 @@ public class ValidatorTest {
     assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
     // Because the version isn't given, this should load the "current" version of hl7.fhir.us.mcode
-    IgResponse ig = validator.loadIg("hl7.fhir.us.mcode", null);
+    IgResponse ig = validator.loadIg("hl7.fhir.us.mcode", "2.0.0");
     assertEquals("hl7.fhir.us.mcode", ig.id);
     assertTrue(ig.profiles.containsAll(profilesToLoad));
     assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
