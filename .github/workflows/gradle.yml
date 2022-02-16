@@ -33,4 +33,4 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.java }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-${{ matrix.java}}-gradle
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace --info
