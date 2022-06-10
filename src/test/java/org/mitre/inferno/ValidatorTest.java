@@ -107,6 +107,7 @@ public class ValidatorTest {
 
   @Test
   void loadIg() throws Exception {
+    // more of a sanity check, the below profiles are subject to change
     List<String> profilesToLoad = Arrays.asList(
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-comorbidities-parent",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-disease-status",
