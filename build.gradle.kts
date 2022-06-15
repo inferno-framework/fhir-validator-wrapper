@@ -35,7 +35,9 @@ dependencies {
     implementation("com.sparkjava", "spark-core", "2.9.1")
 
     // Testing stuff
+    testImplementation("io.rest-assured:rest-assured:5.1.1")
     testImplementation("org.junit.jupiter", "junit-jupiter", "5.5.2")
+    
 }
 
 java {
