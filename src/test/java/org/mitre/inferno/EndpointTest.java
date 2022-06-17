@@ -2,13 +2,20 @@ package org.mitre.inferno;
 
 import org.mitre.inferno.App;
 import org.mitre.inferno.Validator;
+import org.mitre.inferno.rest.IgResponse;
 
 import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import org.apache.commons.io.IOUtils;
 import java.net.URL;
 import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,12 +26,7 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.RequestSpecification;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +35,6 @@ import org.slf4j.LoggerFactory;
  * Represents a tester for api endpoints.
  */
 public class EndpointTest {
-    private final static String ROOT_URI = "http://localhost:4567";
     private Logger logger = LoggerFactory.getLogger(App.class);
     private static Validator validator;
 
@@ -62,52 +63,46 @@ public class EndpointTest {
         }
         RestAssured.baseURI = baseHost;
     }
-    /* 
-    @Test
-    public void testAssured() throws IOException {
-        RestAssured.given().when().get("/resources").then().statusCode(200);
-    
-    }
-    */
     
     @Test
-    public void resourceTest() {
+    public void getResourceTest() throws Exception{
         try {
             // api and validator responses
             List<String> resources = this.validator.getResources();
             RequestSpecification httpRequest = RestAssured.given();
             Response response = httpRequest.get("/resources");
             ResponseBody body = response.getBody();
-            // convert same to json format
+            // convert to json for comparison
             JsonArray fromAPI = new Gson().fromJson(body.asString(), JsonArray.class);
             JsonArray fromValidator = new Gson().fromJson(resources.toString(), JsonArray.class);
-            // test
-            System.out.println("Response Body is: " + fromAPI.toString());
-            logger.info("Resource Body is: " + fromValidator.toString());
-            System.out.println("Response Body is: " + body.asString());
-            logger.info("Resource Body is: " + resources.toString());
+            // test against resources directly from the validator
             assertEquals(fromAPI.toString(), fromValidator.toString());
         } catch (Exception e){
             e.printStackTrace();
             fail();
         }
-	
     }
-    /* 
+
     @Test
-    public void httpResourceTest() throws IOException {
-        try {
-            List<String> resources = this.validator.getResources();
-            HttpRequest request = HttpRequest.newBuilder().uri(new URI(ROOT_URI + "/resources")).GET().build();
-            HttpClient client = HttpClient.newHttpClient();
-            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-                logger.info("Response Body is: " + response.toString());
-                logger.info("Resource Body is: " + resources.toString());
-                assertEquals(response.toString(), resources.toString());
-        }catch (Exception e) {
-            e.printStackTrace();
-            fail();
-          }
+    public void validateResourceTypeTest() throws IOException{
+        // api responses 
+        JsonObject jsonObj = loadFile("/Users/rpassas/Documents/inferno/fhir-validator-wrapper/src/test/resources/us_core_patient_example.json");
+        //OperationOutcome oo = validator.validate(rawResource,
+        String exampleResource = new Gson().toJson(jsonObj);
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.body(exampleResource).when().post("/Patient/validate");
+        ResponseBody body = response.getBody();
+        // convert to json for comparison
+        JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
+        String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
+        // test against resources directly from the validator
+        assertTrue(fromAPI.has("resourceType"));
+        assertEquals("All OK", validation);
     }
-    */
+    
+    JsonObject loadFile (String fileName) throws FileNotFoundException, IOException{
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        JsonObject obj = JsonParser.parseReader(br).getAsJsonObject();
+        return obj;
+    }
 }
