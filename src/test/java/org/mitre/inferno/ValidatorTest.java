@@ -207,13 +207,13 @@ public class ValidatorTest {
     assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
-  boolean isProfileLoaded(String profile) {
+  public boolean isProfileLoaded(String profile) {
     return validator
         .getStructures()
         .contains(profile);
   }
 
-  byte[] loadFile(String fileName) throws IOException {
-    return IOUtils.toByteArray(getClass().getClassLoader().getResource(fileName));
+  public byte[] loadFile(String fileName) throws IOException {
+  return IOUtils.toByteArray(getClass().getClassLoader().getResource(fileName));
   }
 }

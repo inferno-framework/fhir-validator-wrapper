@@ -26,8 +26,9 @@ dependencies {
     implementation("org.fhir", "ucum", "1.0.2")
     implementation("com.squareup.okhttp3", "okhttp", "4.9.0")
 
-    // GSON for our JSON needs
+    // GSON for our JSON needs (simple json for loading into rest-assured for testing)
     implementation("com.google.code.gson", "gson", "2.8.6")
+
 
     implementation("org.slf4j", "slf4j-log4j12", "1.7.30")
 
