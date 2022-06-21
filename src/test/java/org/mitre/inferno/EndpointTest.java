@@ -82,20 +82,67 @@ public class EndpointTest {
             fail();
         }
     }
-
+    
     @Test
-    public void validateResourceTypeTest() throws IOException{
+    public void validateResourceBasicURL() throws IOException{
         // api responses 
-        JsonObject jsonObj = loadFile("/Users/rpassas/Documents/inferno/fhir-validator-wrapper/src/test/resources/us_core_patient_example.json");
-        //OperationOutcome oo = validator.validate(rawResource,
+        JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
+        String exampleResource = new Gson().toJson(jsonObj);
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.body(exampleResource).when().post("/validate");
+        ResponseBody body = response.getBody();
+        // process the response
+        JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
+        String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
+        // test response
+        assertTrue(fromAPI.has("resourceType"));
+        assertEquals("All OK", validation);
+    }
+    
+    @Test
+    public void validateResourceBasicURLWithType() throws IOException{
+        // api responses 
+        JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/Patient/validate");
         ResponseBody body = response.getBody();
-        // convert to json for comparison
+        // process the response
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
         String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
-        // test against resources directly from the validator
+        // test response
+        assertTrue(fromAPI.has("resourceType"));
+        assertEquals("All OK", validation);
+    }
+    
+    @Test
+    public void validateResourceWithType() throws IOException{
+        // api responses 
+        JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
+        String exampleResource = new Gson().toJson(jsonObj);
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.body(exampleResource).when().post("/Patient/$validate");
+        ResponseBody body = response.getBody();
+        // process the response
+        JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
+        String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
+        // test response
+        assertTrue(fromAPI.has("resourceType"));
+        assertEquals("All OK", validation);
+    }
+
+    @Test
+    public void validateResourceWithID() throws IOException{
+        // api responses 
+        JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
+        String exampleResource = new Gson().toJson(jsonObj);
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.body(exampleResource).when().post("Patient/123/$validate");
+        ResponseBody body = response.getBody();
+        // process the response
+        JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
+        String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
+        // test response
         assertTrue(fromAPI.has("resourceType"));
         assertEquals("All OK", validation);
     }
