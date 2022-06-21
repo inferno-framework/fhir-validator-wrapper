@@ -40,19 +40,25 @@ public class ValidatorEndpoint {
    */
   private void createRoutes() {
 
-    post("*/$validate",
+    post("/*/%24validate",
     (req, res) -> {
       res.type("application/fhir+json");
       return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
     });
 
-    post("*/*/$validate",
+    post("/*/*/%24validate",
     (req, res) -> {
       res.type("application/fhir+json");
       return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
     });
 
-    post("*/validate",
+    post("/*/validate",
+    (req, res) -> {
+      res.type("application/fhir+json");
+      return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
+    });
+
+    post("/validate",
     (req, res) -> {
       res.type("application/fhir+json");
       return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
