@@ -29,7 +29,6 @@ dependencies {
     // GSON for our JSON needs (simple json for loading into rest-assured for testing)
     implementation("com.google.code.gson", "gson", "2.8.6")
 
-
     implementation("org.slf4j", "slf4j-log4j12", "1.7.30")
 
     // Web Server
@@ -38,7 +37,6 @@ dependencies {
     // Testing stuff
     testImplementation("io.rest-assured:rest-assured:5.1.1")
     testImplementation("org.junit.jupiter", "junit-jupiter", "5.5.2")
-    
 }
 
 java {

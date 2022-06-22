@@ -9,6 +9,24 @@
 the JSON or XML FHIR resource to validate
 - **Response:**
 a JSON [OperationOutcome](https://www.hl7.org/fhir/operationoutcome.html)
+---
+- **Route:**
+`POST [Resource]/$validate`
+- **Query Params:**
+`profile=[comma separated list of profile URLs]` (Required)
+- **Body:**
+the JSON or XML FHIR resource to validate
+- **Response:**
+a JSON [OperationOutcome](https://www.hl7.org/fhir/operationoutcome.html)
+---
+- **Route:**
+`POST [Resource]/[id]/$validate`
+- **Query Params:**
+`profile=[comma separated list of profile URLs]` (Required)
+- **Body:**
+the JSON or XML FHIR resource to validate
+- **Response:**
+a JSON [OperationOutcome](https://www.hl7.org/fhir/operationoutcome.html)
 
 ### List supported resources
 - **Route:**
