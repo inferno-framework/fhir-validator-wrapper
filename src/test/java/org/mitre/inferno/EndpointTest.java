@@ -8,13 +8,10 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import org.apache.commons.io.IOUtils;
-import java.net.URL;
 import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.BeforeAll;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -22,11 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import io.restassured.RestAssured;
-import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
-import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +63,7 @@ public class EndpointTest {
     public void getResourceTest() throws Exception{
         try {
             // api and validator responses
-            List<String> resources = this.validator.getResources();
+            List<String> resources = EndpointTest.validator.getResources();
             RequestSpecification httpRequest = RestAssured.given();
             Response response = httpRequest.get("/resources");
             ResponseBody body = response.getBody();
@@ -90,22 +85,6 @@ public class EndpointTest {
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/validate");
-        ResponseBody body = response.getBody();
-        // process the response
-        JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
-        String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
-        // test response
-        assertTrue(fromAPI.has("resourceType"));
-        assertEquals("All OK", validation);
-    }
-    
-    @Test
-    public void validateResourceBasicURLWithType() throws IOException{
-        // api responses 
-        JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
-        String exampleResource = new Gson().toJson(jsonObj);
-        RequestSpecification httpRequest = RestAssured.given();
-        Response response = httpRequest.body(exampleResource).when().post("/Patient/validate");
         ResponseBody body = response.getBody();
         // process the response
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
@@ -154,22 +133,6 @@ public class EndpointTest {
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/validate?profile=http://hl7.org/fhir/StructureDefinition/Claim");
-        ResponseBody body = response.getBody();
-        // process the response
-        JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
-        String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("severity").getAsString();
-        // test response
-        assertTrue(fromAPI.has("resourceType"));
-        assertEquals("error", validation);
-    }
-
-    @Test
-    public void validateResourceBasicURLWithTypeWrongProfile() throws IOException{
-        // api responses 
-        JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
-        String exampleResource = new Gson().toJson(jsonObj);
-        RequestSpecification httpRequest = RestAssured.given();
-        Response response = httpRequest.body(exampleResource).when().post("/Patient/validate?profile=http://hl7.org/fhir/StructureDefinition/Claim");
         ResponseBody body = response.getBody();
         // process the response
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);

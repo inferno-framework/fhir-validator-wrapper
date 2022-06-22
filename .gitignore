@@ -44,6 +44,8 @@ gradle-app.setting
 
 # IDE
 .idea
+.vscode
+settings.json
 
 # Mac Stuff
 .DS_Store
