@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mitre.inferno.rest.IgResponse;
 
-
 public class ValidatorTest {
   private static Validator validator;
 
@@ -103,7 +102,7 @@ public class ValidatorTest {
   @Test
   void getKnownIGs() throws IOException {
     Set<String> knownIGs = validator.getKnownIGs().keySet();
-    assertTrue(knownIGs.contains("hl7.fhir.r4.core"));
+    assertTrue(knownIGs.contains("hl7.fhir.us.core"));
   }
 
   @Test
