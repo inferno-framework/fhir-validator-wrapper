@@ -35,16 +35,13 @@ public class EndpointTest {
 
     @BeforeAll
     public static void setup() throws Exception {
-        // get validation results directly from a validator instance
         try {
             validator = new Validator("./igs");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // start the wrapper app
         String [] args = {};
         App.main(args);
-        // set up restAssured for tests that center its use
         String port = System.getProperty("server.port");
         if (port == null) {
             RestAssured.port = Integer.valueOf(4567);
@@ -62,15 +59,13 @@ public class EndpointTest {
     @Test
     public void getResourceTest() throws Exception{
         try {
-            // api and validator responses
             List<String> resources = EndpointTest.validator.getResources();
             RequestSpecification httpRequest = RestAssured.given();
             Response response = httpRequest.get("/resources");
             ResponseBody body = response.getBody();
-            // convert to json for comparison
+
             JsonArray fromAPI = new Gson().fromJson(body.asString(), JsonArray.class);
             JsonArray fromValidator = new Gson().fromJson(resources.toString(), JsonArray.class);
-            // test against resources directly from the validator
             assertEquals(fromAPI.toString(), fromValidator.toString());
         } catch (Exception e){
             e.printStackTrace();
@@ -80,96 +75,95 @@ public class EndpointTest {
     
     @Test
     public void validateResourceBasicURL() throws IOException{
-        // api responses 
         JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/validate");
         ResponseBody body = response.getBody();
-        // process the response
+
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
         String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
-        // test response
+
         assertTrue(fromAPI.has("resourceType"));
         assertEquals("All OK", validation);
     }
     
     @Test
     public void validateResourceWithType() throws IOException{
-        // api responses 
+
         JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/Patient/$validate");
         ResponseBody body = response.getBody();
-        // process the response
+
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
         String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
-        // test response
+
         assertTrue(fromAPI.has("resourceType"));
         assertEquals("All OK", validation);
     }
 
     @Test
     public void validateResourceWithID() throws IOException{
-        // api responses 
+
         JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("Patient/12345/$validate");
         ResponseBody body = response.getBody();
-        // process the response
+
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
         String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("details").getAsJsonObject().get("text").getAsString();
-        // test response
+
         assertTrue(fromAPI.has("resourceType"));
         assertEquals("All OK", validation);
     }
 
     @Test
     public void validateResourceBasicURLWrongProfile() throws IOException{
-        // api responses 
+
         JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/validate?profile=http://hl7.org/fhir/StructureDefinition/Claim");
         ResponseBody body = response.getBody();
-        // process the response
+
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
         String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("severity").getAsString();
-        // test response
+
         assertTrue(fromAPI.has("resourceType"));
         assertEquals("error", validation);
     }
 
     @Test
     public void validateResourceWithTypeWrongProfile() throws IOException{
-        // api responses 
+
         JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/Patient/$validate?profile=http://hl7.org/fhir/StructureDefinition/Claim");
         ResponseBody body = response.getBody();
-        // process the response
+
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
         String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("severity").getAsString();
-        // test response
+
         assertTrue(fromAPI.has("resourceType"));
         assertEquals("error", validation);
     }
 
     @Test
     public void validateResourceWithIDWrongProfile() throws IOException{
-        // api responses 
+
         JsonObject jsonObj = loadFile("src/test/resources/us_core_patient_example.json");
         String exampleResource = new Gson().toJson(jsonObj);
         RequestSpecification httpRequest = RestAssured.given();
         Response response = httpRequest.body(exampleResource).when().post("/Patient/12345/$validate?profile=http://hl7.org/fhir/StructureDefinition/Claim");
         ResponseBody body = response.getBody();
-        // process the response
+
         JsonObject fromAPI = new Gson().fromJson(body.asString(), JsonObject.class);
         String validation = JsonParser.parseString(body.asString()).getAsJsonObject().getAsJsonArray("issue").get(0).getAsJsonObject().get("severity").getAsString();
-        // test response
+ 
         assertTrue(fromAPI.has("resourceType"));
         assertEquals("error", validation);
     }
