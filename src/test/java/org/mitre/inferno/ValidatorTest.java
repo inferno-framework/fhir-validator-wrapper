@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mitre.inferno.rest.IgResponse;
 
@@ -19,9 +20,14 @@ import org.mitre.inferno.rest.IgResponse;
 public class ValidatorTest {
   private static Validator validator;
 
-  @BeforeAll
-  static void setUp() throws Exception {
+  @BeforeEach
+  public void setUp() throws Exception {
     validator = new Validator("./igs");
+  }
+
+  @AfterEach
+  public void cleanUp() throws Exception {
+    validator = null;
   }
 
   @Test
@@ -82,7 +88,7 @@ public class ValidatorTest {
       fail();
     }
   }
-
+  
   @Test
   void validateMultipleProfiles() {
     try {
@@ -105,8 +111,6 @@ public class ValidatorTest {
     List<String> profilesToLoad = Arrays.asList(
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-comorbidities-parent",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-disease-status",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-genetic-variant",
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-genomics-report",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-request",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-surgical-procedure",

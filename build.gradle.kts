@@ -51,10 +51,20 @@ checkstyle {
     toolVersion = "8.25"
 }
 
+jacoco {
+    toolVersion = "0.8.8"
+}
+
 tasks.test {
     useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
+    }
+    configure<JacocoTaskExtension> {
+        excludes = mutableListOf("org/hl7/fhir/r4/formats/JsonParser",
+                "org/hl7/fhir/r5/formats/JsonParser",
+                "org/hl7/fhir/r4/formats/XmlParser",
+                "org/hl7/fhir/r5/formats/XmlParser")
     }
 }
 
