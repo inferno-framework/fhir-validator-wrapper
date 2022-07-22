@@ -15,7 +15,7 @@ import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.model.CodeType;
 import org.hl7.fhir.r5.model.CodeableConcept;
-import org.hl7.fhir.r5.model.FhirPublication;
+import org.hl7.fhir.utilities.FhirPublication;
 import org.hl7.fhir.r5.model.ImplementationGuide;
 import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.OperationOutcome;
@@ -31,6 +31,7 @@ import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
 import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
+import org.hl7.fhir.validation.ValidationEngine.ValidationEngineBuilder;
 import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
 
@@ -53,7 +54,8 @@ public class Validator {
     final String txLog = null;
     final String fhirVersion = "4.0.1";
 
-    hl7Validator = new ValidationEngine(definitions);
+    ValidationEngineBuilder engineBuilder = new ValidationEngineBuilder().withTxServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
+    hl7Validator = engineBuilder.fromSource(definitions);
     
     // The two lines below turn off URL resolution checking in the validator. 
     // This eliminates the need to silence these errors elsewhere in Inferno

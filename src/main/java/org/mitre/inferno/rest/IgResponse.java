@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.hl7.fhir.utilities.TextFile;
-import org.hl7.fhir.utilities.json.JSONUtil;
+import org.hl7.fhir.utilities.json.JsonUtilities;
 import org.hl7.fhir.utilities.npm.NpmPackage;
 
 public class IgResponse {
@@ -46,8 +46,8 @@ public class IgResponse {
     List<String> profileUrls = new ArrayList<>();
     for (JsonElement f : files) {
       JsonObject file = (JsonObject) f;
-      String type = JSONUtil.str(file, "resourceType");
-      String url = JSONUtil.str(file, "url");
+      String type = JsonUtilities.str(file, "resourceType");
+      String url = JsonUtilities.str(file, "url");
       if (type.equals("StructureDefinition")) {
         profileUrls.add(url);
       }
