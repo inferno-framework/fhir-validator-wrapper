@@ -1,9 +1,5 @@
 package org.mitre.inferno;
 
-import org.mitre.inferno.App;
-import org.mitre.inferno.Validator;
-import org.mitre.inferno.rest.IgResponse;
-
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -22,15 +18,12 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
  * Represents a tester for api endpoints.
  */
 public class EndpointTest {
-    private Logger logger = LoggerFactory.getLogger(App.class);
     private static Validator validator;
 
     @BeforeAll
