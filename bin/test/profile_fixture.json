@@ -1,7 +1,0 @@
-{
-  "resourceType" : "StructureDefinition",
-  "name": "blah",
-  "url" : "http://hl7.org/fhir/StructureDefinition/blah",
-  "version" : "4.0.1",
-  "status" : "draft"
-}
