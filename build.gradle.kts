@@ -36,7 +36,6 @@ dependencies {
 
     // Testing stuff
     testImplementation("org.junit.jupiter", "junit-jupiter", "5.5.2")
-    testImplementation("io.rest-assured","rest-assured","3.0.0")
 }
 
 java {
