@@ -101,7 +101,7 @@ public class Validator {
    * @return a sorted list of distinct structure canonicals
    */
   public List<String> getStructures() {
-    List<StructureDefinition> structures = hl7Validator.getContext().getStructures();
+    List<StructureDefinition> structures = hl7Validator.getContext().fetchResourcesByType(StructureDefinition.class);
     return structures
         .stream()
         .map(StructureDefinition::getUrl)
