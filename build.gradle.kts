@@ -56,6 +56,7 @@ jacoco {
 }
 
 tasks.test {
+    environment(mapOf("DISABLE_TX" to "true"))
     useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
