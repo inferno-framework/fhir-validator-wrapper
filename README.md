@@ -1,7 +1,5 @@
 # HL7 FHIR Validation Service
 
-[![Build Status](https://travis-ci.com/inferno-community/fhir-validator-wrapper.svg?branch=master)](https://travis-ci.com/inferno-community/fhir-validator-wrapper)
-
 The `inferno-framework/fhir-validator-wrapper` provides a persistent service for
 executing the [HL7 FHIR®
 Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator),
@@ -15,8 +13,8 @@ UI](https://github.com/inferno-framework/fhir-validator-app) for validating FHIR
 resources.
 
 Since this is just a lightweight wrapper around the HL7 FHIR Validator, most of
-the functionality provided by this service is implemented within the [HL7 FHIR
-Validator](https://github.com/hapifhir/org.hl7.fhir.validator-wrapper), which is
+the functionality provided by this service is [implemented within the HL7 FHIR
+Validator](https://github.com/hapifhir/org.hl7.fhir.core), which is
 developed and maintained independently of this project.
 
 The team that maintains the HL7 FHIR Validator has since created [their
