@@ -15,7 +15,6 @@ import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
 import org.hl7.fhir.r5.model.CodeType;
 import org.hl7.fhir.r5.model.CodeableConcept;
-import org.hl7.fhir.utilities.FhirPublication;
 import org.hl7.fhir.r5.model.ImplementationGuide;
 import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.OperationOutcome;
@@ -23,10 +22,10 @@ import org.hl7.fhir.r5.model.OperationOutcome.IssueType;
 import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
+import org.hl7.fhir.utilities.FhirPublication;
 import org.hl7.fhir.utilities.VersionUtilities;
 import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.npm.NpmPackage;
-import org.hl7.fhir.utilities.npm.ToolsVersion;
 import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
 import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
@@ -54,7 +53,12 @@ public class Validator {
     final String txLog = null;
     final String fhirVersion = "4.0.1";
 
-    ValidationEngineBuilder engineBuilder = new ValidationEngineBuilder().withTxServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
+    ValidationEngineBuilder engineBuilder =
+        new ValidationEngineBuilder().withTxServer(
+                                                   txServer,
+                                                   txLog,
+                                                   FhirPublication.fromCode(fhirVersion)
+                                                   );
     hl7Validator = engineBuilder.fromSource(definitions);
     
     // The two lines below turn off URL resolution checking in the validator. 
@@ -69,7 +73,14 @@ public class Validator {
     File[] igFiles = dir.listFiles((d, name) -> name.endsWith(".tgz"));
     if (igFiles != null) {
       for (File igFile : igFiles) {
-        hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), igFile.getAbsolutePath(), true);
+        hl7Validator
+            .getIgLoader()
+            .loadIg(
+                    hl7Validator.getIgs(),
+                    hl7Validator.getBinaries(),
+                    igFile.getAbsolutePath(),
+                    true
+                    );
       }
     }
 
@@ -78,7 +89,7 @@ public class Validator {
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.prepare();
 
-    packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
+    packageManager = new FilesystemPackageCacheManager(true);
     loadedPackages = new HashMap<>();
   }
 
@@ -101,7 +112,10 @@ public class Validator {
    * @return a sorted list of distinct structure canonicals
    */
   public List<String> getStructures() {
-    List<StructureDefinition> structures = hl7Validator.getContext().fetchResourcesByType(StructureDefinition.class);
+    List<StructureDefinition> structures =
+        hl7Validator
+            .getContext()
+            .fetchResourcesByType(StructureDefinition.class);
     return structures
         .stream()
         .map(StructureDefinition::getUrl)
@@ -126,12 +140,24 @@ public class Validator {
     } catch (Exception e) {
       // Add our own OperationOutcome for errors that break the ValidationEngine
       OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.FATAL;
-      OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(sev, IssueType.STRUCTURE);
+      OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
+                                                                                sev,
+                                                                                IssueType.STRUCTURE
+                                                                                );
       issue.setDiagnostics(e.getMessage());
       issue.setDetails(new CodeableConcept().setText(e.getMessage()));
-      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line", new IntegerType(1));
-      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col", new IntegerType(1));
-      issue.addExtension("http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source", new CodeType("ValidationService"));
+      issue.addExtension(
+                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+                         new IntegerType(1)
+                         );
+      issue.addExtension(
+                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+                         new IntegerType(1)
+                         );
+      issue.addExtension(
+                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+                         new CodeType("ValidationService")
+                         );
       oo = new OperationOutcome(issue);
     }
     return oo;
@@ -203,7 +229,14 @@ public class Validator {
     NpmPackage npm = findCustomPackage(id, version);
     // Fallback to packages from packages.fhir.org if no custom packages match
     if (npm == null) {
-      hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), id + (version != null ? "#" + version : ""), true);
+      hl7Validator
+          .getIgLoader()
+          .loadIg(
+                  hl7Validator.getIgs(),
+                  hl7Validator.getBinaries(),
+                  id + (version != null ? "#" + version : ""),
+                  true
+                  );
       npm = packageManager.loadPackage(id, version);
     }
     return IgResponse.fromPackage(npm);
@@ -220,7 +253,14 @@ public class Validator {
     temp.deleteOnExit();
     try {
       FileUtils.writeByteArrayToFile(temp, content);
-      hl7Validator.getIgLoader().loadIg(hl7Validator.getIgs(), hl7Validator.getBinaries(), temp.getCanonicalPath(), true);
+      hl7Validator
+          .getIgLoader()
+          .loadIg(
+                  hl7Validator.getIgs(),
+                  hl7Validator.getBinaries(),
+                  temp.getCanonicalPath(),
+                  true
+                  );
     } finally {
       temp.delete();
     }
