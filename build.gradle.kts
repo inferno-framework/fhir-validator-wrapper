@@ -55,6 +55,12 @@ jacoco {
     toolVersion = "0.8.8"
 }
 
+tasks {
+  withType<JavaCompile> {
+    options.compilerArgs.add("-Xlint:deprecation")
+  }
+}
+
 tasks.test {
     environment(mapOf("DISABLE_TX" to "true"))
     useJUnitPlatform()

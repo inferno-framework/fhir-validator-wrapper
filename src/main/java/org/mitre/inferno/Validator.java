@@ -26,7 +26,6 @@ import org.hl7.fhir.utilities.FhirPublication;
 import org.hl7.fhir.utilities.VersionUtilities;
 import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.npm.NpmPackage;
-import org.hl7.fhir.utilities.npm.ToolsVersion;
 import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
 import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
@@ -90,7 +89,7 @@ public class Validator {
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.prepare();
 
-    packageManager = new FilesystemPackageCacheManager(true, ToolsVersion.TOOLS_VERSION);
+    packageManager = new FilesystemPackageCacheManager(true);
     loadedPackages = new HashMap<>();
   }
 
