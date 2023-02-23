@@ -1,10 +1,27 @@
 # HL7 FHIR Validation Service
 
-[![Build Status](https://travis-ci.com/inferno-community/fhir-validator-wrapper.svg?branch=master)](https://travis-ci.com/inferno-community/fhir-validator-wrapper)
+The `inferno-framework/fhir-validator-wrapper` provides a persistent service for
+executing the [HL7 FHIR®
+Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator),
+which historically only was available as a Java library and a CLI-based tool.
+This lightweight wrapper enables applications not implemented in Java, such as
+the [Inferno Framework](https://inferno-framework.github.io), to interface with
+the HL7 Validator in a service environment.  It is primarily being used within
+the Inferno Framework to provide FHIR validation services for tests, as well as
+to provide a [simple web-based
+UI](https://github.com/inferno-framework/fhir-validator-app) for validating FHIR
+resources.
 
-The `fhir-validator-wrapper` provides a persistent service for executing the 
-[FHIR® Validator](https://wiki.hl7.org/Using_the_FHIR_Validator). It is intended to provide validation capabilities
-to other applications that integrate it.
+Since this is just a lightweight wrapper around the HL7 FHIR Validator, most of
+the functionality provided by this service is [implemented within the HL7 FHIR
+Validator](https://github.com/hapifhir/org.hl7.fhir.core), which is
+developed and maintained independently of this project.
+
+The team that maintains the HL7 FHIR Validator has since created [their
+own service API](https://github.com/hapifhir/org.hl7.fhir.validator-wrapper) for
+the HL7 FHIR validator, making this wrapper service redundant.  This GitHub
+project may be retired in favor of using that service, but will be maintained as
+long as the Inferno set of tools continues to use it.
 
 ## REST API
 
@@ -19,11 +36,13 @@ to other applications that integrate it.
 To build and run the test suite:
 
 ### *nix
+
 ```shell script
 ./gradlew build check test
 ```
 
 ### Windows
+
 ```shell script
 gradlew.bat build check test
 ```
@@ -35,6 +54,7 @@ To run the app:
 ```
 
 The port can also be set through the environment
+
 ```shell script
 VALIDATOR_PORT=8080 ./gradlew run
 ```
@@ -42,20 +62,26 @@ VALIDATOR_PORT=8080 ./gradlew run
 ## Running with Docker
 
 Build
+
+
 ```shell script
 ./build_docker.sh
 ```
+
 Run
+
 ```shell script
 docker run -p 4567:4567 hl7_validator
 ```
 
 Run with a different terminology server:
+
 ```shell script
 docker run -p 4567:4567 --env TX_SERVER_URL=http://mytx.org/r4 hl7_validator
 ```
 
 Run without terminology validation:
+
 ```shell script
 docker run -p 4567:4567 --env DISABLE_TX=true hl7_validator
 ```
@@ -73,11 +99,14 @@ By default, the uber jar will be located in `build/lib/`.
 This uber jar can be executed with `java -jar InfernoValidationService-<version>-uber.jar`
 
 ## Contact Us
-The Inferno development team can be reached by email at inferno@groups.mitre.org.  Inferno also has a dedicated [HL7 FHIR chat channel](https://chat.fhir.org/#narrow/stream/153-inferno).
+
+The Inferno development team can be reached by email at
+inferno@groups.mitre.org.  Inferno also has a dedicated [HL7 FHIR chat
+channel](https://chat.fhir.org/#narrow/stream/153-inferno).
 
 ## License
 
-Copyright 2019 The MITRE Corporation
+Copyright 2023 The MITRE Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 ```
