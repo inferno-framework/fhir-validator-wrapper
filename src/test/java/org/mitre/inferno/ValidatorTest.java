@@ -107,8 +107,8 @@ public class ValidatorTest {
 
   @Test
   void loadIg() throws Exception {
+    // A small subset of the profiles in mCODE 3.0.0
     List<String> profilesToLoad = Arrays.asList(
-        "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-comorbidities-parent",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-disease-status",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-patient",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-related-medication-request",
@@ -118,6 +118,8 @@ public class ValidatorTest {
     assertTrue(profilesToLoad.stream().noneMatch(this::isProfileLoaded));
 
     // Because the version isn't given, this should load the "current" version of hl7.fhir.us.mcode
+    // Note this means that if a new version is published that changes the profile names
+    // (as has happened in updates 1->2 and 2->3) this test may fail
     IgResponse ig = validator.loadIg("hl7.fhir.us.mcode", null);
     assertEquals("hl7.fhir.us.mcode", ig.id);
     assertTrue(ig.profiles.containsAll(profilesToLoad));
