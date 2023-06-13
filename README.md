@@ -1,7 +1,7 @@
-# HL7 FHIR Validation Service
+# HL7® FHIR® Validation Service
 
 The `inferno-framework/fhir-validator-wrapper` provides a persistent service for
-executing the [HL7 FHIR®
+executing the [HL7® FHIR®
 Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator),
 which historically only was available as a Java library and a CLI-based tool.
 This lightweight wrapper enables applications not implemented in Java, such as
@@ -113,3 +113,8 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 http://www.apache.org/licenses/LICENSE-2.0
 ```
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+## Trademark Notice
+
+HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of Health
+Level Seven International and their use does not constitute endorsement by HL7.
