@@ -26,7 +26,7 @@ dependencies {
     implementation("org.fhir", "ucum", "1.0.2")
     implementation("com.squareup.okhttp3", "okhttp", "4.9.0")
 
-    // GSON for our JSON needs
+    // GSON for our JSON needs (simple json for loading into rest-assured for testing)
     implementation("com.google.code.gson", "gson", "2.8.6")
 
     implementation("org.slf4j", "slf4j-log4j12", "1.7.30")
@@ -35,6 +35,7 @@ dependencies {
     implementation("com.sparkjava", "spark-core", "2.9.1")
 
     // Testing stuff
+    testImplementation("io.rest-assured:rest-assured:5.1.1")
     testImplementation("org.junit.jupiter", "junit-jupiter", "5.5.2")
 }
 
@@ -65,6 +66,7 @@ tasks.test {
     environment(mapOf("DISABLE_TX" to "true"))
     useJUnitPlatform()
     testLogging {
+        showStandardStreams = true
         events("passed", "skipped", "failed")
     }
     configure<JacocoTaskExtension> {

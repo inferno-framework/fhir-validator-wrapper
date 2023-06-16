@@ -39,11 +39,24 @@ public class ValidatorEndpoint {
    * Creates the API routes for receiving and processing requests for the validation service.
    */
   private void createRoutes() {
+
+    post("/*/%24validate",
+    (req, res) -> {
+      res.type("application/fhir+json");
+      return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
+    });
+    
+    post("/*/*/%24validate",
+    (req, res) -> {
+      res.type("application/fhir+json");
+      return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
+    });
+    
     post("/validate",
-        (req, res) -> {
-          res.type("application/fhir+json");
-          return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
-        });
+    (req, res) -> {
+      res.type("application/fhir+json");
+      return validateResource(req.bodyAsBytes(), req.queryParams("profile"));
+    });
 
     get("/resources", (req, res) -> validator.getResources(), TO_JSON);
 

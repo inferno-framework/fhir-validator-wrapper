@@ -107,6 +107,7 @@ public class ValidatorTest {
 
   @Test
   void loadIg() throws Exception {
+    // more of a sanity check, the below profiles are subject to change
     List<String> profilesToLoad = Arrays.asList(
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-comorbidities-parent",
         "http://hl7.org/fhir/us/mcode/StructureDefinition/mcode-cancer-disease-status",
@@ -206,13 +207,13 @@ public class ValidatorTest {
     assertTrue(profilesToLoad.stream().allMatch(this::isProfileLoaded));
   }
 
-  boolean isProfileLoaded(String profile) {
+  public boolean isProfileLoaded(String profile) {
     return validator
         .getStructures()
         .contains(profile);
   }
 
-  byte[] loadFile(String fileName) throws IOException {
-    return IOUtils.toByteArray(getClass().getClassLoader().getResource(fileName));
+  public byte[] loadFile(String fileName) throws IOException {
+  return IOUtils.toByteArray(getClass().getClassLoader().getResource(fileName));
   }
 }
