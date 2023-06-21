@@ -86,6 +86,12 @@ Run without terminology validation:
 docker run -p 4567:4567 --env DISABLE_TX=true hl7_validator
 ```
 
+By default, the validator will return errors when a code display doesn't match the expected value from the terminology server. To return warnings instead:
+
+```shell script
+docker run -p 4567:4567 --env DISPLAY_ISSUES_ARE_WARNINGS=true hl7_validator
+```
+
 ## Creating an Uber Jar
 
 An uber jar can be created with:
