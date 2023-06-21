@@ -10,10 +10,15 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
+import org.hl7.fhir.r5.model.OperationOutcome;
+import org.hl7.fhir.r5.model.OperationOutcome.IssueSeverity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.mitre.inferno.rest.IgResponse;
 
 public class ValidatorTest {
@@ -21,7 +26,7 @@ public class ValidatorTest {
 
   @BeforeEach
   public void setUp() throws Exception {
-    validator = new Validator("./igs");
+    validator = new Validator("./igs", true);
   }
 
   @AfterEach
@@ -96,6 +101,54 @@ public class ValidatorTest {
     } catch (Exception e) {
       e.printStackTrace();
       fail();
+    }
+  }
+
+  @Test
+  @DisabledIfEnvironmentVariable(named = "DISABLE_TX", matches = ".*")
+  // This test is disabled when we don't use a terminology server to check codes.
+  // Run it locally by unsetting the test environment var in build.gradle (or in your IDE of choice)
+  void validateDisplayWarnings() {
+    try {
+      byte[] correct = loadFile("resource_with_correct_code_display.json");
+      byte[] incorrect = loadFile("resource_with_incorrect_code_display.json");
+      List<String> medicationProfile = Arrays.asList("http://hl7.org/fhir/StructureDefinition/Medication");
+
+      // first set display issues = errors, the default
+      validator = new Validator("./igs", false);
+
+      OperationOutcome oo = validator.validate(correct, medicationProfile);
+      assertHasValidationErrors(oo, false); // no errors for the correct display
+
+      oo = validator.validate(incorrect, medicationProfile);
+      assertHasValidationErrors(oo, true); // an error expected for the incorrect display
+
+      // now set display issues = warnings
+      validator = new Validator("./igs", true);
+
+      oo = validator.validate(correct, medicationProfile);
+      assertHasValidationErrors(oo, false); // still no errors for the correct display
+
+      oo = validator.validate(incorrect, medicationProfile);
+      assertHasValidationErrors(oo, false); // no errors anymore for the incorrect display
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail();
+    }
+  }
+
+  void assertHasValidationErrors(OperationOutcome oo, boolean areErrorsExpected) {
+    String codesForErrors = oo.getIssue()
+        .stream()
+        .filter(i -> i.getSeverity() == IssueSeverity.ERROR
+                  || i.getSeverity() == IssueSeverity.FATAL)
+        .map(i -> i.getDetails().getText())
+        .collect(Collectors.joining(","));
+
+    if (areErrorsExpected) {
+      assertFalse(codesForErrors.isBlank(), codesForErrors);
+    } else {
+      assertTrue(codesForErrors.isBlank(), codesForErrors);
     }
   }
 

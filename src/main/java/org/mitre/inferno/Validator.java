@@ -46,6 +46,19 @@ public class Validator {
    * @throws Exception If the validator cannot be created
    */
   public Validator(String igDir) throws Exception {
+    this(igDir, false);
+  }
+
+  /**
+   * Creates the HL7 Validator to which can then be used for validation.
+   *
+   * @param igDir A directory containing tarred/gzipped IG packages
+   * @param displayIssuesAreWarnings
+   *    Toggles whether code display mismatches should be
+   *      reported as warnings (true) or errors (false).
+   * @throws Exception If the validator cannot be created
+   */
+  public Validator(String igDir, boolean displayIssuesAreWarnings) throws Exception {
     final String fhirSpecVersion = "4.0";
     final String definitions = VersionUtilities.packageForVersion(fhirSpecVersion)
         + "#" + VersionUtilities.getCurrentVersion(fhirSpecVersion);
@@ -87,6 +100,7 @@ public class Validator {
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setDoNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
+    hl7Validator.setDisplayWarnings(displayIssuesAreWarnings);
     hl7Validator.prepare();
 
     packageManager = new FilesystemPackageCacheManager(true);
