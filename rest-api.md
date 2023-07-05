@@ -65,13 +65,12 @@ the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#load
 - **Route:**
 `GET /version`
 - **Response:**
-A string representing the version of the wrapper being used.
+A JSON object containing identifiers and version numbers for the software in use, such as the version of the wrapper itself and the version of the HL7 validator.
+- **Example Response:**
+```
+{"org.hl7.fhir.validation":"5.6.93","inferno-framework/fhir-validator-wrapper":"2.2.1"}
+```
 
-### Get the validator's version
-- **Route:**
-`GET /validator-version`
-- **Response:**
-A string representing which HL7 validator version is being used.
 
 # FHIRPath Routes
 
