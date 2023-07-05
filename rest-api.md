@@ -61,6 +61,18 @@ Also note that the request must have the `Content-Encoding: gzip` header.
 - **Response:**
 the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#loading-a-custom-ig) for an example.
 
+### Get this wrapper's version
+- **Route:**
+`GET /version`
+- **Response:**
+A string representing the version of the wrapper being used.
+
+### Get the validator's version
+- **Route:**
+`GET /validator-version`
+- **Response:**
+A string representing which HL7 validator version is being used.
+
 # FHIRPath Routes
 
 ### Evaluate a FHIRPath expression

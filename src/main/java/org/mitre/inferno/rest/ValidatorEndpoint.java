@@ -65,6 +65,8 @@ public class ValidatorEndpoint {
         (req, res) -> validator.loadIg(req.params("id"), req.queryParams("version")),
         TO_JSON);
 
+    get("/validator-version", (req, res) -> validator.getValidatorVersion());
+
     get("/version", (req, res) -> Version.getVersion());
   }
 
