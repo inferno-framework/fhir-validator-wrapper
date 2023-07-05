@@ -7,11 +7,13 @@ import static spark.Spark.put;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.mitre.inferno.Validator;
-import org.mitre.inferno.Version;
 
 public class ValidatorEndpoint {
   private static ValidatorEndpoint validatorEndpoint = null;
@@ -65,9 +67,7 @@ public class ValidatorEndpoint {
         (req, res) -> validator.loadIg(req.params("id"), req.queryParams("version")),
         TO_JSON);
 
-    get("/validator-version", (req, res) -> validator.getValidatorVersion());
-
-    get("/version", (req, res) -> Version.getVersion());
+    get("/version", (req, res) -> buildVersionResponse(), TO_JSON);
   }
 
   /**
@@ -88,5 +88,22 @@ public class ValidatorEndpoint {
 
     OperationOutcome oo = validator.validate(resource, patientProfiles);
     return new JsonParser().composeString(oo);
+  }
+
+  /**
+   * Build a Map of the library versions used by this validator.
+   *
+   * @return a Map of library identifier -> version string
+   */
+  private Map<String,String> buildVersionResponse() {
+    // full package names used here only to make it more obvious what's going on
+    // since the class names aren't distinct enough
+    String hl7ValidatorVersion = org.hl7.fhir.validation.cli.utils.VersionUtil.getVersion();
+    String wrapperVersion = org.mitre.inferno.Version.getVersion();
+
+    Map<String, String> versions = new HashMap<>();
+    versions.put("org.hl7.fhir.validation", hl7ValidatorVersion);
+    versions.put("inferno-framework/fhir-validator-wrapper", wrapperVersion);
+    return versions;
   }
 }
