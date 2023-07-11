@@ -306,15 +306,6 @@ public class Validator {
   }
 
   /**
-   * Get the version of the validator used under the hood.
-   *
-   * @return the validator version as a string
-   */
-  public String getValidatorVersion() {
-    return VersionUtil.getVersion();
-  }
-
-  /**
    * Load a profile from a file.
    *
    * @param src the file path
