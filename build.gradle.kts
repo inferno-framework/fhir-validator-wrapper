@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "6.0.16")
+    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "6.0.21")
 
     // validator dependencies (should be able to get these automatically?)
     implementation("org.apache.commons","commons-compress", "1.19")

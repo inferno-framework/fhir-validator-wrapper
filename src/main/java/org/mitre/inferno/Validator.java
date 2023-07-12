@@ -64,7 +64,7 @@ public class Validator {
     // The two lines below turn off URL resolution checking in the validator. 
     // This eliminates the need to silence these errors elsewhere in Inferno
     // And also keeps contained resources from failing validation based solely on URL errors
-    ValidationControl vc = new BaseValidator(null, null)
+    ValidationControl vc = new BaseValidator(null, null, false)
                              .new ValidationControl(false, IssueSeverity.INFORMATION);
     hl7Validator.getValidationControl().put("Type_Specific_Checks_DT_URL_Resolve", vc);
 
