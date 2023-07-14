@@ -35,7 +35,7 @@ dependencies {
     implementation("com.sparkjava", "spark-core", "2.9.1")
 
     // Testing stuff
-    testImplementation("org.junit.jupiter", "junit-jupiter", "5.5.2")
+    testImplementation("org.junit.jupiter", "junit-jupiter", "5.9.3")
 }
 
 java {
@@ -63,6 +63,7 @@ tasks {
 
 tasks.test {
     environment(mapOf("DISABLE_TX" to "true"))
+    maxHeapSize = "6144m"
     useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
