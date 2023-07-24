@@ -61,6 +61,17 @@ Also note that the request must have the `Content-Encoding: gzip` header.
 - **Response:**
 the NPM ID, version, and list of profile URLs of the loaded IG. [See here](#loading-a-custom-ig) for an example.
 
+### Get this wrapper's version
+- **Route:**
+`GET /version`
+- **Response:**
+A JSON object containing identifiers and version numbers for the software in use, such as the version of the wrapper itself and the version of the HL7 validator.
+- **Example Response:**
+```
+{"org.hl7.fhir.validation":"5.6.93","inferno-framework/fhir-validator-wrapper":"2.2.1"}
+```
+
+
 # FHIRPath Routes
 
 ### Evaluate a FHIRPath expression

@@ -305,10 +305,6 @@ public class Validator {
         ));
   }
 
-  public String getVersion() {
-    return VersionUtil.getVersion();
-  }
-
   /**
    * Load a profile from a file.
    *
