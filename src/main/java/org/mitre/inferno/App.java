@@ -34,7 +34,7 @@ public class App {
   private static Validator initializeValidator() {
     Logger logger = LoggerFactory.getLogger(App.class);
     try {
-      return new Validator("./igs");
+      return new Validator("./igs", areDisplayIssuesWarnings());
     } catch (Exception e) {
       logger.error("There was an error initializing the validator:", e);
       System.exit(1);
@@ -68,10 +68,20 @@ public class App {
   }
 
   private static int getPortNumber() {
-    if (System.getenv("VALIDATOR_PORT") != null) {
-      return Integer.parseInt(System.getenv("VALIDATOR_PORT"));
+    String port = System.getenv("VALIDATOR_PORT");
+    if (port != null) {
+      return Integer.parseInt(port);
     } else {
       return 4567;
+    }
+  }
+
+  private static boolean areDisplayIssuesWarnings() {
+    String displayIssuesAreWarnings = System.getenv("DISPLAY_ISSUES_ARE_WARNINGS");
+    if (displayIssuesAreWarnings != null) {
+      return Boolean.parseBoolean(displayIssuesAreWarnings);
+    } else {
+      return false;
     }
   }
 }

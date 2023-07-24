@@ -1,0 +1,12 @@
+{
+  "resourceType": "Medication",
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "340584",
+        "display": "miracle juice"
+      }
+    ]
+  }
+}
