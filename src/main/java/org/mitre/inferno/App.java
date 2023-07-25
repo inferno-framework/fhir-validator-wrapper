@@ -10,7 +10,11 @@ public class App {
 
   /**
    * Starting point for the Validation Service.
-   * <p>Passing the 'prepare' argument causes the FHIR artifacts needed to be downloaded.</p>
+   * <p>
+   * Passing the 'prepare' argument causes the FHIR artifacts needed to be
+   * downloaded.
+   * </p>
+   * 
    * @param args the application initialization arguments
    */
   public static void main(String[] args) {
@@ -60,11 +64,11 @@ public class App {
     Logger logger = LoggerFactory.getLogger(App.class);
     logger.info("Starting Server...");
     SparkUtils.createServerWithRequestLog(logger);
+    Endpoints.setupLoadingRoutes(getPortNumber());
     Endpoints.getInstance(
         initializeValidator(),
         initializePathEvaluator(),
-        getPortNumber()
-    );
+        getPortNumber());
   }
 
   private static int getPortNumber() {

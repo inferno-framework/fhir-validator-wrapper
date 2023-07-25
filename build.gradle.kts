@@ -29,7 +29,7 @@ dependencies {
     implementation("org.slf4j", "slf4j-log4j12", "1.7.30")
 
     // Web Server
-    implementation("com.sparkjava", "spark-core", "2.9.1")
+    implementation("com.sparkjava", "spark-core", "2.9.4")
 
     // Testing stuff
     testImplementation("org.junit.jupiter", "junit-jupiter", "5.9.3")
