@@ -28,10 +28,12 @@ public class Endpoints {
   }
 
   /**
-   * This adds permissive CORS headers to all requests.
+   * Set up temporary routes while the validator still loads.
+   * 
+   * @param port the port to listen for requests on
    */
-  private static void setHeaders() {
-
+  public static void setupLoadingRoutes(int port) {
+    port(port);
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
@@ -42,17 +44,6 @@ public class Endpoints {
     // requests,
     // with a 200 OK response with no content and the CORS headers above
     options("*", (req, res) -> "");
-
-  }
-
-  /**
-   * Set up temporary routes while the validator still loads.
-   * 
-   * @param port the port to listen for requests on
-   */
-  public static void setupLoadingRoutes(int port) {
-    port(port);
-    setHeaders();
 
     JsonObject warning = new JsonObject();
     warning.addProperty("Warning", "Validator still loading... please wait.");
@@ -106,7 +97,6 @@ public class Endpoints {
    * clients.
    */
   private void createRoutes() {
-    setHeaders();
 
     if (validator != null) {
       ValidatorEndpoint.getInstance(validator);
