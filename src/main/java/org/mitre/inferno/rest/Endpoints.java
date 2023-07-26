@@ -1,12 +1,19 @@
 package org.mitre.inferno.rest;
 
 import static spark.Spark.before;
+import static spark.Spark.exception;
 import static spark.Spark.options;
 import static spark.Spark.port;
 
 import com.google.gson.Gson;
+
+import java.io.IOException;
+
+import org.hl7.fhir.r5.formats.JsonParser;
+import org.hl7.fhir.r5.model.OperationOutcome;
 import org.mitre.inferno.FHIRPathEvaluator;
 import org.mitre.inferno.Validator;
+
 import spark.ResponseTransformer;
 
 public class Endpoints {
@@ -44,6 +51,24 @@ public class Endpoints {
    * Creates the API routes for receiving and processing HTTP requests from clients.
    */
   private void createRoutes() {
+    // This adds global exception handling.
+    // Note: it currently does not distinguish between 4xx and 5xx type errors,
+    // and the spark framework does not catch all Throwables/Errors (eg, OOM).
+    exception(Exception.class, (e, req, res) -> {
+      res.type("application/fhir+json");
+      OperationOutcome oo = Validator.exceptionToOperationOutcome(e);
+      String body;
+      try {
+        body = new JsonParser().composeString(oo);
+      } catch (IOException e1) {
+        // "should never happen"
+        // for now just wrap some text in quotes so it's valid JSON.
+        res.status(500);
+        body = "\"Exception occurred in handler. Original exception was: " + e.getMessage() + '"';
+      }
+      res.body(body);
+    });
+
     // This adds permissive CORS headers to all requests
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");

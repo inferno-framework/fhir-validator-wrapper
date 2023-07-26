@@ -153,28 +153,39 @@ public class Validator {
       oo = hl7Validator.validate(fmt, resourceStream, profiles);
     } catch (Exception e) {
       // Add our own OperationOutcome for errors that break the ValidationEngine
-      OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.FATAL;
-      OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
-                                                                                sev,
-                                                                                IssueType.STRUCTURE
-                                                                                );
-      issue.setDiagnostics(e.getMessage());
-      issue.setDetails(new CodeableConcept().setText(e.getMessage()));
-      issue.addExtension(
-                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
-                         new IntegerType(1)
-                         );
-      issue.addExtension(
-                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
-                         new IntegerType(1)
-                         );
-      issue.addExtension(
-                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
-                         new CodeType("ValidationService")
-                         );
-      oo = new OperationOutcome(issue);
+      oo = exceptionToOperationOutcome(e);
     }
     return oo;
+  }
+
+  /**
+   * Map an Exception into an OperationOutcome.
+   * The OperationOutcome will have FATAL severity and contain the Exception text,
+   * but not the stack trace.
+   * @param e An Exception that occurred in processing a request
+   * @return an OperationOutcome resource representing the Exception
+   */
+  public static OperationOutcome exceptionToOperationOutcome(Exception e) {
+    OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.FATAL;
+    OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
+                                                                              sev,
+                                                                              IssueType.STRUCTURE
+                                                                              );
+    issue.setDiagnostics(e.getMessage());
+    issue.setDetails(new CodeableConcept().setText(e.getMessage()));
+    issue.addExtension(
+                       "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+                       new IntegerType(1)
+                       );
+    issue.addExtension(
+                       "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+                       new IntegerType(1)
+                       );
+    issue.addExtension(
+                       "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+                       new CodeType("ValidationService")
+                       );
+    return new OperationOutcome(issue);
   }
 
   /**
