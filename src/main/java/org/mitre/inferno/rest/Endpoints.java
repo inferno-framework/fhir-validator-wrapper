@@ -12,7 +12,6 @@ import com.google.gson.Gson;
 import org.mitre.inferno.FHIRPathEvaluator;
 import org.mitre.inferno.Validator;
 import spark.ResponseTransformer;
-import com.google.gson.JsonObject;
 
 public class Endpoints {
   public static final ResponseTransformer TO_JSON = new Gson()::toJson;
@@ -28,12 +27,10 @@ public class Endpoints {
   }
 
   /**
-   * Set up temporary routes while the validator still loads.
-   * 
-   * @param port the port to listen for requests on
+   * This adds permissive CORS headers to all requests.
    */
-  public static void setupLoadingRoutes(int port) {
-    port(port);
+  private static void setHeaders() {
+
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
@@ -45,20 +42,34 @@ public class Endpoints {
     // with a 200 OK response with no content and the CORS headers above
     options("*", (req, res) -> "");
 
-    JsonObject warning = new JsonObject();
-    warning.addProperty("Warning", "Validator still loading... please wait.");
+  }
+
+  /**
+   * Set up temporary routes while the validator still loads.
+   * 
+   * @param port the port on which to listen for requests
+   */
+  public static void setupLoadingRoutes(int port) {
+    port(port);
+    setHeaders();
 
     get("*", (req, res) -> {
       res.type("application/fhir+json");
-      return warning;
+      res.status(503);
+      res.body("Validator still loading... please wait.");
+      return res;
     });
     post("*", (req, res) -> {
       res.type("application/fhir+json");
-      return warning;
+      res.status(503);
+      res.body("Validator still loading... please wait.");
+      return res;
     });
     put("*", (req, res) -> {
       res.type("application/fhir+json");
-      return warning;
+      res.status(503);
+      res.body("Validator still loading... please wait.");
+      return res;
     });
   }
 
