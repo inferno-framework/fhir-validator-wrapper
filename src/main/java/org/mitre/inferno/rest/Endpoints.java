@@ -8,10 +8,20 @@ import static spark.Spark.post;
 import static spark.Spark.put;
 import static spark.Spark.unmap;
 
+import java.io.IOException;
+
 import com.google.gson.Gson;
 import org.mitre.inferno.FHIRPathEvaluator;
 import org.mitre.inferno.Validator;
 import spark.ResponseTransformer;
+
+import org.hl7.fhir.r5.formats.JsonParser;
+import org.hl7.fhir.r5.model.OperationOutcome;
+import org.hl7.fhir.r5.model.OperationOutcome.IssueType;
+import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
+import org.hl7.fhir.r5.model.CodeableConcept;
+import org.hl7.fhir.r5.model.IntegerType;
+import org.hl7.fhir.r5.model.CodeType;
 
 public class Endpoints {
   public static final ResponseTransformer TO_JSON = new Gson()::toJson;
@@ -45,6 +55,34 @@ public class Endpoints {
   }
 
   /**
+   * Create a wait message while the validator loads.
+   * 
+   * @throws Exception
+   */
+  private static OperationOutcome generateWaitMessage() throws Exception {
+
+    OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.ERROR;
+    OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
+        sev,
+        IssueType.INFORMATIONAL);
+    String message = "Validator still loading... please wait.";
+    issue.setDiagnostics(message);
+    issue.setDetails(new CodeableConcept().setText(message));
+    issue.addExtension(
+        "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
+        new IntegerType(1));
+    issue.addExtension(
+        "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
+        new IntegerType(1));
+    issue.addExtension(
+        "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
+        new CodeType("ValidationService"));
+    OperationOutcome oo = new OperationOutcome(issue);
+    // return new JsonParser().composeString(oo);
+    return oo;
+  }
+
+  /**
    * Set up temporary routes while the validator still loads.
    * 
    * @param port the port on which to listen for requests
@@ -57,19 +95,19 @@ public class Endpoints {
       res.type("application/fhir+json");
       res.status(503);
       res.body("Validator still loading... please wait.");
-      return res;
+      return generateWaitMessage();
     });
     post("*", (req, res) -> {
       res.type("application/fhir+json");
       res.status(503);
       res.body("Validator still loading... please wait.");
-      return res;
+      return generateWaitMessage();
     });
     put("*", (req, res) -> {
       res.type("application/fhir+json");
       res.status(503);
       res.body("Validator still loading... please wait.");
-      return res;
+      return generateWaitMessage();
     });
   }
 
