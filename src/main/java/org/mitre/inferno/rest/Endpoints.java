@@ -59,12 +59,12 @@ public class Endpoints {
    * 
    * @throws Exception
    */
-  private static OperationOutcome generateWaitMessage() throws Exception {
+  private static String generateWaitMessage() throws Exception {
 
     OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.ERROR;
     OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
         sev,
-        IssueType.INFORMATIONAL);
+        IssueType.INCOMPLETE);
     String message = "Validator still loading... please wait.";
     issue.setDiagnostics(message);
     issue.setDetails(new CodeableConcept().setText(message));
@@ -78,8 +78,7 @@ public class Endpoints {
         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
         new CodeType("ValidationService"));
     OperationOutcome oo = new OperationOutcome(issue);
-    // return new JsonParser().composeString(oo);
-    return oo;
+    return new JsonParser().composeString(oo);
   }
 
   /**
