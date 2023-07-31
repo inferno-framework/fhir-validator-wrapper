@@ -1,27 +1,24 @@
 package org.mitre.inferno.rest;
 
 import static spark.Spark.before;
+import static spark.Spark.get;
 import static spark.Spark.options;
 import static spark.Spark.port;
-import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.put;
 import static spark.Spark.unmap;
 
-import java.io.IOException;
-
 import com.google.gson.Gson;
-import org.mitre.inferno.FHIRPathEvaluator;
-import org.mitre.inferno.Validator;
-import spark.ResponseTransformer;
-
 import org.hl7.fhir.r5.formats.JsonParser;
+import org.hl7.fhir.r5.model.CodeType;
+import org.hl7.fhir.r5.model.CodeableConcept;
+import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.OperationOutcome;
 import org.hl7.fhir.r5.model.OperationOutcome.IssueType;
 import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
-import org.hl7.fhir.r5.model.CodeableConcept;
-import org.hl7.fhir.r5.model.IntegerType;
-import org.hl7.fhir.r5.model.CodeType;
+import org.mitre.inferno.FHIRPathEvaluator;
+import org.mitre.inferno.Validator;
+import spark.ResponseTransformer;
 
 public class Endpoints {
   public static final ResponseTransformer TO_JSON = new Gson()::toJson;
@@ -57,7 +54,7 @@ public class Endpoints {
   /**
    * Create a wait message while the validator loads.
    * 
-   * @throws Exception
+   * @throws Exception if operation outcome cannot be parsed
    */
   private static String generateWaitMessage() throws Exception {
 
