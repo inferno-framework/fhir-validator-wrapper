@@ -17,16 +17,14 @@ repositories {
 dependencies {
     implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "6.0.21")
 
-    // validator dependencies (should be able to get these automatically?)
-    implementation("org.apache.commons","commons-compress", "1.19")
-    implementation("org.apache.httpcomponents", "httpclient", "4.5.10")
-    implementation("org.fhir", "ucum", "1.0.2")
+    // validator dependency needed for terminology (why can't it get this automatically?)
     implementation("com.squareup.okhttp3", "okhttp", "4.9.0")
 
     // GSON for our JSON needs
-    implementation("com.google.code.gson", "gson", "2.8.6")
+    implementation("com.google.code.gson", "gson", "2.10.1")
 
-    implementation("org.slf4j", "slf4j-log4j12", "1.7.30")
+    // Basic logging. Reload4J is a security-focused fork of Log4J 1.x
+    implementation("org.slf4j", "slf4j-reload4j", "2.0.7")
 
     // Web Server
     implementation("com.sparkjava", "spark-core", "2.9.4")
