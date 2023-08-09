@@ -32,7 +32,6 @@ import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.ValidationEngine.ValidationEngineBuilder;
-import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
 
 public class Validator {
