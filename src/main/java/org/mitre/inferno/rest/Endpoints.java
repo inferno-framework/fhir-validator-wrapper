@@ -9,6 +9,10 @@ import static spark.Spark.put;
 import static spark.Spark.unmap;
 
 import com.google.gson.Gson;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hl7.fhir.r5.formats.JsonParser;
 import org.hl7.fhir.r5.model.CodeType;
 import org.hl7.fhir.r5.model.CodeableConcept;
@@ -37,7 +41,6 @@ public class Endpoints {
    * This adds permissive CORS headers to all requests.
    */
   private static void setHeaders() {
-
     before((req, res) -> {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
@@ -48,7 +51,6 @@ public class Endpoints {
     // requests,
     // with a 200 OK response with no content and the CORS headers above
     options("*", (req, res) -> "");
-
   }
 
   /**
@@ -57,7 +59,6 @@ public class Endpoints {
    * @throws Exception if operation outcome cannot be parsed
    */
   private static String generateWaitMessage() throws Exception {
-
     OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.ERROR;
     OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
         sev,
@@ -79,13 +80,20 @@ public class Endpoints {
   }
 
   /**
-   * Set up temporary routes while the validator still loads.
+   * Set up routes that should be active before the validator finishes loading.
    * 
    * @param port the port on which to listen for requests
    */
   public static void setupLoadingRoutes(int port) {
     port(port);
     setHeaders();
+
+    get("/version", (req, res) -> buildVersionResponse(), TO_JSON);
+
+    // Per spark docs: https://sparkjava.com/documentation#routes
+    // "Routes are matched in the order they are defined.
+    //  The first route that matches the request is invoked."
+    // so these temporary * routes must be set after /version
 
     get("*", (req, res) -> {
       res.type("application/fhir+json");
@@ -152,4 +160,20 @@ public class Endpoints {
     }
   }
 
+  /**
+   * Build a Map of the library versions used by this validator.
+   *
+   * @return a Map of library identifier -> version string
+   */
+  private static Map<String,String> buildVersionResponse() {
+    // full package names used here only to make it more obvious what's going on
+    // since the class names aren't distinct enough
+    String hl7ValidatorVersion = org.hl7.fhir.validation.cli.utils.VersionUtil.getVersion();
+    String wrapperVersion = org.mitre.inferno.Version.getVersion();
+
+    Map<String, String> versions = new HashMap<>();
+    versions.put("org.hl7.fhir.validation", hl7ValidatorVersion);
+    versions.put("inferno-framework/fhir-validator-wrapper", wrapperVersion);
+    return versions;
+  }
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.ValidationEngine.ValidationEngineBuilder;
-import org.hl7.fhir.validation.cli.utils.VersionUtil;
 import org.mitre.inferno.rest.IgResponse;
 
 public class Validator {
@@ -85,6 +85,9 @@ public class Validator {
     File dir = new File(igDir);
     File[] igFiles = dir.listFiles((d, name) -> name.endsWith(".tgz"));
     if (igFiles != null) {
+      // sort the files by name to ensure a consistent order -- see File.compareTo(File)
+      // https://docs.oracle.com/javase/8/docs/api/java/io/File.html#compareTo-java.io.File-
+      Arrays.sort(igFiles);
       for (File igFile : igFiles) {
         hl7Validator
             .getIgLoader()
