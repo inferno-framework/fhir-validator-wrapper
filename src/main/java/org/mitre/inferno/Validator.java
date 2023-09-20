@@ -81,13 +81,26 @@ public class Validator {
                              .new ValidationControl(false, IssueSeverity.INFORMATION);
     hl7Validator.getValidationControl().put("Type_Specific_Checks_DT_URL_Resolve", vc);
 
+    Runtime rt = Runtime.getRuntime();
+
+    long totalMemory = rt.totalMemory();
+    long freeMemory = rt.freeMemory();
+    long usedMemory = totalMemory - freeMemory;
+
+    System.out.println(
+                String.format("Memory Usage -- Total: %s, Free: %s, Used: %s",
+                    totalMemory,
+                    freeMemory,
+                    usedMemory));
+
     // Get all the package gzips in the "igs/package" directory
     File dir = new File(igDir);
     File[] igFiles = dir.listFiles((d, name) -> name.endsWith(".tgz"));
     if (igFiles != null) {
       // sort the files by name to ensure a consistent order -- see File.compareTo(File)
       // https://docs.oracle.com/javase/8/docs/api/java/io/File.html#compareTo-java.io.File-
-      Arrays.sort(igFiles);
+      //Arrays.sort(igFiles);
+      java.util.Collections.shuffle(Arrays.asList(igFiles));
       for (File igFile : igFiles) {
         hl7Validator
             .getIgLoader()
@@ -97,6 +110,25 @@ public class Validator {
                     igFile.getAbsolutePath(),
                     true
                     );
+
+        System.gc();
+
+        totalMemory = rt.totalMemory();
+        freeMemory = rt.freeMemory();
+
+        long diff = (totalMemory - freeMemory) - usedMemory;
+
+        System.out.println(
+                String.format("Memory Usage -- Total: %s, Free: %s, Used: %s",
+                    totalMemory,
+                    freeMemory,
+                    totalMemory - freeMemory));
+
+        System.out.println(igFile.getName() + " est memory usage " + diff);
+
+        usedMemory = totalMemory - freeMemory;
+
+
       }
     }
 
@@ -105,6 +137,8 @@ public class Validator {
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.setDisplayWarnings(displayIssuesAreWarnings);
     hl7Validator.prepare();
+
+    System.out.println("done");
 
     packageManager = new FilesystemPackageCacheManager(true);
     loadedPackages = new HashMap<>();
