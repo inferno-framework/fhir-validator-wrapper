@@ -1,4 +1,4 @@
-# HL7® FHIR® Validation Service
+# Inferno Resource Validation Service
 
 The `inferno-framework/fhir-validator-wrapper` provides a persistent service for
 executing the [HL7® FHIR®
