@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r4.context.SimpleWorkerContext;
 import org.hl7.fhir.r4.model.Base;
-import org.hl7.fhir.r4.utils.FHIRPathEngine;
+import org.hl7.fhir.r4.fhirpath.FHIRPathEngine;
 
 public class FHIRPathEvaluator extends FHIRPathEngine {
 
