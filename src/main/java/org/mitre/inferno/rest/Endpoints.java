@@ -168,7 +168,7 @@ public class Endpoints {
   private static Map<String,String> buildVersionResponse() {
     // full package names used here only to make it more obvious what's going on
     // since the class names aren't distinct enough
-    String hl7ValidatorVersion = org.hl7.fhir.validation.cli.utils.VersionUtil.getVersion();
+    String hl7ValidatorVersion = org.hl7.fhir.utilities.VersionUtil.getVersion();
     String wrapperVersion = org.mitre.inferno.Version.getVersion();
 
     Map<String, String> versions = new HashMap<>();
