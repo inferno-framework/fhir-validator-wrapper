@@ -33,11 +33,14 @@ import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.ValidationEngine.ValidationEngineBuilder;
 import org.mitre.inferno.rest.IgResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Validator {
   private final ValidationEngine hl7Validator;
   private final FilesystemPackageCacheManager packageManager;
   private final Map<String, NpmPackage> loadedPackages;
+  private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
 
   /**
    * Creates the HL7 Validator to which can then be used for validation.
@@ -151,6 +154,20 @@ public class Validator {
   public OperationOutcome validate(byte[] resource, List<String> profiles) {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(resource);
     ByteArrayInputStream resourceStream = new ByteArrayInputStream(resource);
+
+    try {
+      Resource resourceObj = FormatUtilities.makeParser(fmt).parse(resource);
+      String metaProfiles = "[]";
+      if (resourceObj.hasMeta() && resourceObj.getMeta().hasProfile()) {
+        metaProfiles = resourceObj.getMeta().getProfile().toString();
+      }
+      LOGGER.info("Validating resource with type: " + resourceObj.fhirType()
+          + ", selected profile: " + profiles.toString()
+          + " and meta.profile: " + metaProfiles);
+    } catch (Exception e) {
+      LOGGER.warn("Error occurred in parsing resource for logging", e);
+    }
+
     OperationOutcome oo;
     try {
       oo = hl7Validator.validate(fmt, resourceStream, profiles);
@@ -207,6 +224,13 @@ public class Validator {
     Manager.FhirFormat fmt = FormatUtilities.determineFormat(profile);
     Resource resource = FormatUtilities.makeParser(fmt).parse(profile);
     hl7Validator.getContext().cacheResource(resource);
+    if (resource instanceof StructureDefinition) {
+      StructureDefinition sd = (StructureDefinition)resource;
+      LOGGER.info("Loaded profile from file, url: " + sd.getUrl() + " version: " + sd.getVersion());
+    } else if (resource != null) {
+      LOGGER.info("Loaded resource from file but it wasn't a StructureDefinition, it was a "
+        + resource.fhirType());
+    }
   }
 
   /**
@@ -255,6 +279,9 @@ public class Validator {
                   true
                   );
       npm = packageManager.loadPackage(id, version);
+      if (npm != null) {
+        LOGGER.info("Loaded IG by identifier: " + npm.id() + "#" + npm.version());
+      }
     }
     return IgResponse.fromPackage(npm);
   }
@@ -283,6 +310,7 @@ public class Validator {
     }
     NpmPackage npm = NpmPackage.fromPackage(new ByteArrayInputStream(content));
     loadedPackages.put(npm.id() + "#" + npm.version(), npm);
+    LOGGER.info("Loaded IG from tgz upload: " + npm.id() + "#" + npm.version());
     return IgResponse.fromPackage(npm);
   }
 
