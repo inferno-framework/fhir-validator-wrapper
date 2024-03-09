@@ -124,3 +124,16 @@ in the current working directory.
     ]
 }
 ```
+
+# Transformer Routes
+
+### Transform a resource
+- **Route:**
+`POST /transform`
+- **Query Params:**
+`direction=[XML2JSON | JSON2XML]` (Required)
+`fhir_version=[R3 | R4 | R5]` (Required)
+- **Body:**
+the JSON or XML FHIR resource to transform
+- **Response:**
+the transformed JSON or XML FHIR resource

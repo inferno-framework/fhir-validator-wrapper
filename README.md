@@ -1,4 +1,4 @@
-# Inferno Resource Validation Service
+# Inferno Resource Validation & Transformation! Service
 
 The `inferno-framework/fhir-validator-wrapper` provides a persistent service for
 executing the [HL7® FHIR®
@@ -22,6 +22,12 @@ own service API](https://github.com/hapifhir/org.hl7.fhir.validator-wrapper) for
 the HL7 FHIR validator, making this wrapper service redundant.  This GitHub
 project may be retired in favor of using that service, but will be maintained as
 long as the Inferno set of tools continues to use it.
+
+As it happens, there is also a need for a transformation part to this service 
+that allows one to take either a JSON or XML FHIR resource and transform it to 
+the other format type, for example JSON->XML or XML->JSON. FHIR R3, R4, & R5 
+version are supported. Transformation are done via [FHIR HAPI](https://hapifhir.io/) which is developed
+and maintained independently of this project.
 
 ## REST API
 
