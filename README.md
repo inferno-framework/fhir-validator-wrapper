@@ -26,7 +26,7 @@ long as the Inferno set of tools continues to use it.
 As it happens, there is also a need for a transformation part to this service 
 that allows one to take either a JSON or XML FHIR resource and transform it to 
 the other format type, for example JSON->XML or XML->JSON. FHIR R3, R4, & R5 
-version are supported. Transformation are done via [FHIR HAPI](https://hapifhir.io/) which is developed
+version are supported. Transformations are done via [FHIR HAPI](https://hapifhir.io/) which is developed
 and maintained independently of this project.
 
 ## REST API
