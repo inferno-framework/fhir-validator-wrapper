@@ -14,13 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r5.elementmodel.Manager;
 import org.hl7.fhir.r5.formats.FormatUtilities;
-import org.hl7.fhir.r5.model.CodeType;
-import org.hl7.fhir.r5.model.CodeableConcept;
 import org.hl7.fhir.r5.model.ImplementationGuide;
-import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.OperationOutcome;
-import org.hl7.fhir.r5.model.OperationOutcome.IssueType;
-import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
 import org.hl7.fhir.utilities.FhirPublication;
@@ -33,6 +28,7 @@ import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.ValidationEngine.ValidationEngineBuilder;
 import org.mitre.inferno.rest.IgResponse;
+import org.mitre.inferno.utils.EndpointUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +72,6 @@ public class Validator {
                                                    FhirPublication.fromCode(fhirVersion)
                                                    );
     hl7Validator = engineBuilder.fromSource(definitions);
-    
     // The two lines below turn off URL resolution checking in the validator. 
     // This eliminates the need to silence these errors elsewhere in Inferno
     // And also keeps contained resources from failing validation based solely on URL errors
@@ -103,6 +98,8 @@ public class Validator {
       }
     }
 
+	LOGGER.info("Initializing Validator using TSServer ("+txServer+") with fhirVersion ("+fhirVersion+") ");
+																										
     hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
     hl7Validator.setDoNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
@@ -173,26 +170,7 @@ public class Validator {
       oo = hl7Validator.validate(fmt, resourceStream, profiles);
     } catch (Exception e) {
       // Add our own OperationOutcome for errors that break the ValidationEngine
-      OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.FATAL;
-      OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
-                                                                                sev,
-                                                                                IssueType.STRUCTURE
-                                                                                );
-      issue.setDiagnostics(e.getMessage());
-      issue.setDetails(new CodeableConcept().setText(e.getMessage()));
-      issue.addExtension(
-                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
-                         new IntegerType(1)
-                         );
-      issue.addExtension(
-                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
-                         new IntegerType(1)
-                         );
-      issue.addExtension(
-                         "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
-                         new CodeType("ValidationService")
-                         );
-      oo = new OperationOutcome(issue);
+      oo = EndpointUtils.getOperationOutcome(e.getMessage(), OperationOutcome.IssueSeverity.FATAL, 177,3);
     }
     return oo;
   }

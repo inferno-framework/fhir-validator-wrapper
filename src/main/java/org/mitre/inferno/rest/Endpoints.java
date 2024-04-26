@@ -14,14 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hl7.fhir.r5.formats.JsonParser;
-import org.hl7.fhir.r5.model.CodeType;
-import org.hl7.fhir.r5.model.CodeableConcept;
-import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.OperationOutcome;
-import org.hl7.fhir.r5.model.OperationOutcome.IssueType;
-import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
 import org.mitre.inferno.FHIRPathEvaluator;
+import org.mitre.inferno.FHIRTransformer;
 import org.mitre.inferno.Validator;
+import org.mitre.inferno.utils.EndpointUtils;
+
 import spark.ResponseTransformer;
 
 public class Endpoints {
@@ -30,10 +28,14 @@ public class Endpoints {
 
   private final Validator validator;
   private final FHIRPathEvaluator pathEvaluator;
+  private final FHIRTransformer transformer;										
 
-  private Endpoints(Validator validator, FHIRPathEvaluator evaluator) {
+  private static final String waitMessage = "Validator still loading... please wait.";
+
+  private Endpoints(Validator validator, FHIRPathEvaluator evaluator, FHIRTransformer transformer) {
     this.validator = validator;
     this.pathEvaluator = evaluator;
+	this.transformer = transformer;
     createRoutes();
   }
 
@@ -58,25 +60,10 @@ public class Endpoints {
    * 
    * @throws Exception if operation outcome cannot be parsed
    */
-  private static String generateWaitMessage() throws Exception {
-    OperationOutcome.IssueSeverity sev = OperationOutcome.IssueSeverity.ERROR;
-    OperationOutcomeIssueComponent issue = new OperationOutcomeIssueComponent(
-        sev,
-        IssueType.INCOMPLETE);
-    String message = "Validator still loading... please wait.";
-    issue.setDiagnostics(message);
-    issue.setDetails(new CodeableConcept().setText(message));
-    issue.addExtension(
-        "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-line",
-        new IntegerType(1));
-    issue.addExtension(
-        "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-col",
-        new IntegerType(1));
-    issue.addExtension(
-        "http://hl7.org/fhir/StructureDefinition/operationoutcome-issue-source",
-        new CodeType("ValidationService"));
-    OperationOutcome oo = new OperationOutcome(issue);
-    return new JsonParser().composeString(oo);
+  private static String generateWaitMessage() throws Exception {   
+    return new JsonParser().composeString(
+          EndpointUtils.getOperationOutcome(waitMessage, OperationOutcome.IssueSeverity.ERROR, 67,5)
+          );
   }
 
   /**
@@ -98,19 +85,19 @@ public class Endpoints {
     get("*", (req, res) -> {
       res.type("application/fhir+json");
       res.status(503);
-      res.body("Validator still loading... please wait.");
+      res.body(waitMessage);
       return generateWaitMessage();
     });
     post("*", (req, res) -> {
       res.type("application/fhir+json");
       res.status(503);
-      res.body("Validator still loading... please wait.");
+      res.body(waitMessage);
       return generateWaitMessage();
     });
     put("*", (req, res) -> {
       res.type("application/fhir+json");
       res.status(503);
-      res.body("Validator still loading... please wait.");
+      res.body(waitMessage);
       return generateWaitMessage();
     });
   }
@@ -137,10 +124,10 @@ public class Endpoints {
    * @param port      the port to listen for requests on
    * @return the singleton Endpoints
    */
-  public static Endpoints getInstance(Validator validator, FHIRPathEvaluator evaluator, int port) {
+  public static Endpoints getInstance(Validator validator, FHIRPathEvaluator evaluator, FHIRTransformer transformer, int port) {
     teardownLoadingRoutes();
     if (endpoints == null) {
-      endpoints = new Endpoints(validator, evaluator);
+      endpoints = new Endpoints(validator, evaluator, transformer);
     }
     return endpoints;
   }
@@ -157,6 +144,9 @@ public class Endpoints {
 
     if (pathEvaluator != null) {
       FHIRPathEndpoint.getInstance(pathEvaluator);
+    }
+    if (transformer != null) {
+      FHIRTransformerEndpoint.getInstance(transformer);
     }
   }
 

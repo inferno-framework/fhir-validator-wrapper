@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class App {
 
+  private static final int VALIDATOR_PORT = 4567; //the server default
   /**
    * Starting point for the Validation Service.
    * <p>
@@ -57,6 +58,10 @@ public class App {
     }
   }
 
+  private static FHIRTransformer initializeFHIRTransformer(){
+    return new FHIRTransformer();
+  }
+  
   /**
    * Starts the app.
    */
@@ -66,9 +71,11 @@ public class App {
     SparkUtils.createServerWithRequestLog(logger);
     Endpoints.setupLoadingRoutes(getPortNumber());
     Endpoints.getInstance(
-        initializeValidator(),
-        initializePathEvaluator(),
-        getPortNumber());
+                          initializeValidator()
+                          ,initializePathEvaluator()
+		                      ,initializeFHIRTransformer()
+                          ,getPortNumber()
+                          );
   }
 
   private static int getPortNumber() {
@@ -76,7 +83,7 @@ public class App {
     if (port != null) {
       return Integer.parseInt(port);
     } else {
-      return 4567;
+      return VALIDATOR_PORT;
     }
   }
 
