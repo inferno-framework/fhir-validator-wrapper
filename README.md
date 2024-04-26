@@ -1,5 +1,14 @@
 # Inferno Resource Validation Service
 
+## ⚠️ NOTICE ⚠️ 
+The Inferno Framework is transitioning away from this `inferno-framework/fhir-validator-wrapper`
+to the [HL7® validator-wrapper](https://github.com/hapifhir/org.hl7.fhir.validator-wrapper) 
+and this repository will soon be officially retired.
+
+Read more about this change at https://inferno.healthit.gov/news/2024-03-validator-update/
+
+---
+
 The `inferno-framework/fhir-validator-wrapper` provides a persistent service for
 executing the [HL7® FHIR®
 Validator](https://confluence.hl7.org/display/FHIR/Using+the+FHIR+Validator),
