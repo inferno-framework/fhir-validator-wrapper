@@ -27,6 +27,9 @@ import org.hl7.fhir.utilities.FhirPublication;
 import org.hl7.fhir.utilities.VersionUtilities;
 import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager;
 import org.hl7.fhir.utilities.npm.NpmPackage;
+import org.hl7.fhir.utilities.npm.PackageClient;
+import org.hl7.fhir.utilities.npm.PackageInfo;
+import org.hl7.fhir.utilities.npm.PackageServer;
 import org.hl7.fhir.utilities.validation.ValidationMessage.IssueSeverity;
 import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
@@ -68,12 +71,14 @@ public class Validator {
     final String txServer = getTxServerUrl();
     final String txLog = null;
     final String fhirVersion = "4.0.1";
+    final boolean useEcosystem = true;
 
     ValidationEngineBuilder engineBuilder =
         new ValidationEngineBuilder().withTxServer(
                                                    txServer,
                                                    txLog,
-                                                   FhirPublication.fromCode(fhirVersion)
+                                                   FhirPublication.fromCode(fhirVersion),
+                                                   useEcosystem
                                                    );
     hl7Validator = engineBuilder.fromSource(definitions);
     
@@ -103,7 +108,8 @@ public class Validator {
       }
     }
 
-    hl7Validator.connectToTSServer(txServer, txLog, FhirPublication.fromCode(fhirVersion));
+    hl7Validator.connectToTSServer(
+        txServer, txLog, FhirPublication.fromCode(fhirVersion), useEcosystem);
     hl7Validator.setDoNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.setDisplayWarnings(displayIssuesAreWarnings);
@@ -210,9 +216,25 @@ public class Validator {
       String canonical = e.getValue().canonical();
       igs.put(id, canonical);
     }
-    // Add IGs known to the package manager, replacing any conflicting package IDs
-    packageManager.listAllIds(igs);
+    // Add IGs known to the package manager
+    for (PackageServer next : packageManager.getPackageServers()) {
+      // https://github.com/hapifhir/org.hl7.fhir.core/blob/6.2.8/org.hl7.fhir.utilities/src/main/java/org/hl7/fhir/utilities/npm/FilesystemPackageCacheManager.java#L585
+      listSpecs(igs, next);
+    }
+
     return igs;
+  }
+
+  // copied from
+  // https://github.com/hapifhir/org.hl7.fhir.core/blob/6.2.8/org.hl7.fhir.utilities/src/main/java/org/hl7/fhir/utilities/npm/FilesystemPackageCacheManager.java#L318
+  private void listSpecs(Map<String, String> specList, PackageServer server) throws IOException {
+    PackageClient pc = new PackageClient(server);
+    List<PackageInfo> matches = pc.search(null, null, null, false);
+    for (PackageInfo m : matches) {
+      if (!specList.containsKey(m.getId())) {
+        specList.put(m.getId(), m.getUrl());
+      }
+    }
   }
 
   /**
@@ -229,7 +251,7 @@ public class Validator {
       LOGGER.info("Loaded profile from file, url: " + sd.getUrl() + " version: " + sd.getVersion());
     } else if (resource != null) {
       LOGGER.info("Loaded resource from file but it wasn't a StructureDefinition, it was a "
-        + resource.fhirType());
+          + resource.fhirType());
     }
   }
 
