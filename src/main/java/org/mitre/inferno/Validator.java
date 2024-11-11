@@ -171,7 +171,7 @@ public class Validator {
           + ", selected profile: " + profiles.toString()
           + " and meta.profile: " + metaProfiles);
     } catch (Exception e) {
-      LOGGER.warn("Error occurred in parsing resource for logging", e);
+      // do nothing - this is informational only, and it seems to happen often
     }
 
     OperationOutcome oo;
