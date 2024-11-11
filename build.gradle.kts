@@ -15,16 +15,19 @@ repositories {
 }
 
 dependencies {
-    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "6.2.8")
+    implementation("ca.uhn.hapi.fhir", "org.hl7.fhir.validation", "6.4.0")
 
     // validator dependency needed for terminology (why can't it get this automatically?)
-    implementation("com.squareup.okhttp3", "okhttp", "4.9.0")
+    implementation("com.squareup.okhttp3", "okhttp", "4.12.0")
+
+    // validator dependency needed to prevent a ClassNotFoundException
+    implementation("org.fhir:ucum:1.0.8")
 
     // GSON for our JSON needs
-    implementation("com.google.code.gson", "gson", "2.10.1")
+    implementation("com.google.code.gson", "gson", "2.11.0")
 
     // Basic logging. Reload4J is a security-focused fork of Log4J 1.x
-    implementation("org.slf4j", "slf4j-reload4j", "2.0.7")
+    implementation("org.slf4j", "slf4j-reload4j", "2.0.16")
 
     // Web Server
     implementation("com.sparkjava", "spark-core", "2.9.4")
