@@ -23,6 +23,7 @@ import org.hl7.fhir.r5.model.OperationOutcome.IssueType;
 import org.hl7.fhir.r5.model.OperationOutcome.OperationOutcomeIssueComponent;
 import org.hl7.fhir.r5.model.Resource;
 import org.hl7.fhir.r5.model.StructureDefinition;
+import org.hl7.fhir.r5.utils.validation.constants.ReferenceValidationPolicy;
 import org.hl7.fhir.utilities.FhirPublication;
 import org.hl7.fhir.utilities.VersionUtilities;
 import org.hl7.fhir.utilities.npm.FilesystemPackageCacheManager;
@@ -35,6 +36,8 @@ import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.ValidationEngine.ValidationEngineBuilder;
+import org.hl7.fhir.validation.cli.services.DisabledValidationPolicyAdvisor;
+import org.hl7.fhir.validation.instance.advisor.BasePolicyAdvisorForFullValidation;
 import org.mitre.inferno.rest.IgResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +116,10 @@ public class Validator {
     hl7Validator.setDoNative(false);
     hl7Validator.setAnyExtensionsAllowed(true);
     hl7Validator.setDisplayWarnings(displayIssuesAreWarnings);
+    DisabledValidationPolicyAdvisor policyAdvisor = new DisabledValidationPolicyAdvisor();
+    policyAdvisor.setPolicyAdvisor(
+        new BasePolicyAdvisorForFullValidation(ReferenceValidationPolicy.CHECK_TYPE_IF_EXISTS));
+    hl7Validator.setPolicyAdvisor(policyAdvisor);
     hl7Validator.prepare();
 
     packageManager = new FilesystemPackageCacheManager.Builder().build();
