@@ -21,7 +21,7 @@ dependencies {
     implementation("com.squareup.okhttp3", "okhttp", "4.12.0")
 
     // validator dependency needed to prevent a ClassNotFoundException
-    implementation("org.fhir:ucum:1.0.8")
+    implementation("org.fhir:ucum:1.0.9")
 
     // GSON for our JSON needs
     implementation("com.google.code.gson", "gson", "2.11.0")
