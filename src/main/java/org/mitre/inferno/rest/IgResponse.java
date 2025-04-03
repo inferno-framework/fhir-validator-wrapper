@@ -6,10 +6,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.hl7.fhir.utilities.TextFile;
 import org.hl7.fhir.utilities.json.JsonUtilities;
 import org.hl7.fhir.utilities.npm.NpmPackage;
 
@@ -40,7 +40,7 @@ public class IgResponse {
    */
   public static IgResponse fromPackage(NpmPackage npm) throws IOException {
     InputStream in = npm.load(".index.json");
-    JsonObject index = (JsonObject) JsonParser.parseString(TextFile.streamToString(in));
+    JsonObject index = (JsonObject) JsonParser.parseReader(new InputStreamReader(in));
 
     JsonArray files = index.getAsJsonArray("files");
     List<String> profileUrls = new ArrayList<>();

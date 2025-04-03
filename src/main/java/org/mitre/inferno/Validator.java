@@ -36,6 +36,7 @@ import org.hl7.fhir.validation.BaseValidator;
 import org.hl7.fhir.validation.BaseValidator.ValidationControl;
 import org.hl7.fhir.validation.ValidationEngine;
 import org.hl7.fhir.validation.ValidationEngine.ValidationEngineBuilder;
+import org.hl7.fhir.validation.ValidatorSettings;
 import org.hl7.fhir.validation.cli.services.DisabledValidationPolicyAdvisor;
 import org.hl7.fhir.validation.instance.advisor.BasePolicyAdvisorForFullValidation;
 import org.mitre.inferno.rest.IgResponse;
@@ -88,7 +89,7 @@ public class Validator {
     // The two lines below turn off URL resolution checking in the validator. 
     // This eliminates the need to silence these errors elsewhere in Inferno
     // And also keeps contained resources from failing validation based solely on URL errors
-    ValidationControl vc = new BaseValidator(hl7Validator.getContext(), null, false, null)
+    ValidationControl vc = new BaseValidator(hl7Validator.getContext(), new ValidatorSettings(), null, null)
                              .new ValidationControl(false, IssueSeverity.INFORMATION);
     hl7Validator.getValidationControl().put("Type_Specific_Checks_DT_URL_Resolve", vc);
 
