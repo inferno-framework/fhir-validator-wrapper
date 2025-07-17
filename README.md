@@ -116,7 +116,7 @@ This uber jar can be executed with `java -jar InfernoValidationService-<version>
 ## Contact Us
 
 The Inferno development team can be reached by email at
-inferno@groups.mitre.org.  Inferno also has a dedicated [HL7 FHIR chat
+You may reach the team on the dedicated [Inferno HL7 FHIR chat
 channel](https://chat.fhir.org/#narrow/stream/153-inferno).
 
 ## License
